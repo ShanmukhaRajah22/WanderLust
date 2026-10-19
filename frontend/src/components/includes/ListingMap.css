@@ -1,0 +1,30 @@
+.listing-map-section {
+  padding: 0 0 72px;
+}
+
+.listing-map-section__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.listing-map-section__title {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3vw, 32px);
+  color: var(--ink);
+}
+
+.listing-map-section__heading span {
+  color: var(--ink-light);
+  font-size: 12px;
+}
+
+.listing-map {
+  height: 440px;
+  width: 100%;
+  border: 1px solid var(--dust);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
