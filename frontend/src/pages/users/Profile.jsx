@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-import { useApp } from "../../context/AppContext";
 import { api } from "../../utils/api";
 import ListingCard from "../../components/includes/ListingCard";
 import "./Profile.css";
+import { Avatar, AvatarBadge, AvatarFallback } from "../../components/ui/avatar";
+import PageLoader from "../../components/ui/page-loader";
 
 const stars = (r) => "\u2605".repeat(r) + "\u2606".repeat(5 - r);
 const ini = (n) => n?.[0]?.toUpperCase() ?? "?";
 
 export default function Profile({ onNavigate }) {
-  const { currentUser } = useApp();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -21,12 +21,7 @@ export default function Profile({ onNavigate }) {
   }, []);
 
   if (loading) {
-    return (
-      <div className="loading-wrap">
-        <div className="spinner" />
-        <span>Loading profile...</span>
-      </div>
-    );
+    return <PageLoader text="Loading your profile" />;
   }
 
   if (!data) {
@@ -51,7 +46,10 @@ export default function Profile({ onNavigate }) {
 
       {/* Header */}
       <div className="profile__header">
-        <div className="profile__avatar">{ini(user.username)}</div>
+        <Avatar className="profile__avatar">
+          <AvatarFallback>{ini(user.username)}</AvatarFallback>
+          <AvatarBadge />
+        </Avatar>
         <div className="profile__info">
           <h1 className="profile__username">{user.username}</h1>
           <p className="profile__email">{user.email}</p>

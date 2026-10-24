@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useApp } from "../../context/AppContext";
 import "./Navbar.css";
+import { Avatar, AvatarBadge, AvatarFallback } from "../ui/avatar";
 
 export default function Navbar({ onNavigate }) {
   const { currentUser, logout, showFlash } = useApp();
@@ -24,7 +25,7 @@ export default function Navbar({ onNavigate }) {
         {/* Logo */}
         <button className="navbar__logo" onClick={() => go("home")}>
           {/* <span className="navbar__logo-pin">⌂</span> */}
-          Wanderlust
+          Nestly
         </button>
 
         {/* Centre links */}
@@ -45,9 +46,10 @@ export default function Navbar({ onNavigate }) {
           {currentUser ? (
             <>
               <button className="navbar__user" onClick={() => go("profile")}>
-                <div className="navbar__avatar">
-                  {ini(currentUser.username)}
-                </div>
+                <Avatar className="navbar__avatar">
+                  <AvatarFallback>{ini(currentUser.username)}</AvatarFallback>
+                  <AvatarBadge />
+                </Avatar>
                 <span className="navbar__uname">{currentUser.username}</span>
               </button>
               <button
@@ -106,9 +108,10 @@ export default function Navbar({ onNavigate }) {
                 className="navbar__drawer-user"
                 onClick={() => go("profile")}
               >
-                <div className="navbar__avatar navbar__avatar--sm">
-                  {ini(currentUser.username)}
-                </div>
+                <Avatar className="navbar__avatar navbar__avatar--sm">
+                  <AvatarFallback>{ini(currentUser.username)}</AvatarFallback>
+                  <AvatarBadge />
+                </Avatar>
                 {currentUser.username}
               </button>
               <button

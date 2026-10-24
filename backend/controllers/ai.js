@@ -21,7 +21,7 @@ const openrouter = createOpenAI({
     baseURL: "https://openrouter.ai/api/v1",
     headers: {
         "HTTP-Referer": process.env.FRONTEND_URL || "http://localhost:5173",
-        "X-Title": "WanderLust",
+        "X-Title": "Nestly",
     },
 });
 
@@ -44,8 +44,8 @@ export const chat = async (req, res) => {
     });
 
     const response = await generateText({
-        model: openrouter(process.env.OPENROUTER_MODEL || "openrouter/free"),
-        system: `You are WanderLust's helpful travel assistant.
+        model: openrouter("openrouter/free"),
+        system: `You are Nestly's helpful travel assistant.
 Answer in a short, friendly way.
 When the user asks to find, show, search, or recommend listings, always use the searchListings tool.
 When the user asks if a specific listing is available for dates, use checkListingAvailability.

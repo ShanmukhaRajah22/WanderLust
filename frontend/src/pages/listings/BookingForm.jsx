@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import confetti from "canvas-confetti";
 import { useApp } from "../../context/AppContext";
 import { api } from "../../utils/api";
-
-const today = new Date().toISOString().slice(0, 10);
+import DateRangePicker from "../../components/ui/date-range-picker";
+import { TrashIcon } from "../../components/ui/icon-button";
 
 const nightsBetween = (checkIn, checkOut) => {
   if (!checkIn || !checkOut) return 0;
@@ -133,38 +134,7 @@ export default function BookingForm({ listing, onNavigate }) {
       </div>
 
       <form onSubmit={submit}>
-        <div className="booking-card__dates">
-          <label>
-            Check-in
-            <input
-              type="date"
-              min={today}
-              value={dates.checkIn}
-              onChange={(event) =>
-                setDates((current) => ({
-                  ...current,
-                  checkIn: event.target.value,
-                }))
-              }
-              required
-            />
-          </label>
-          <label>
-            Check-out
-            <input
-              type="date"
-              min={dates.checkIn || today}
-              value={dates.checkOut}
-              onChange={(event) =>
-                setDates((current) => ({
-                  ...current,
-                  checkOut: event.target.value,
-                }))
-              }
-              required
-            />
-          </label>
-        </div>
+        <DateRangePicker value={dates} onChange={setDates} />
 
         {nights > 0 && (
           <div className="booking-card__summary">
@@ -200,7 +170,8 @@ export default function BookingForm({ listing, onNavigate }) {
                   onClick={() => cancelBooking(booking._id)}
                   disabled={deletingId === booking._id}
                 >
-                  {deletingId === booking._id ? "Cancelling…" : "Cancel"}
+                  <TrashIcon size={15} />
+                  <span>{deletingId === booking._id ? "Canceling…" : "Cancel"}</span>
                 </button>
               )}
             </div>
@@ -208,13 +179,15 @@ export default function BookingForm({ listing, onNavigate }) {
         </div>
       )}
       </section>
-      {confirmedBooking && (
-        <BookingSuccess
-          booking={confirmedBooking}
-          listing={listing}
-          onClose={() => setConfirmedBooking(null)}
-        />
-      )}
+      {confirmedBooking &&
+        createPortal(
+          <BookingSuccess
+            booking={confirmedBooking}
+            listing={listing}
+            onClose={() => setConfirmedBooking(null)}
+          />,
+          document.body,
+        )}
     </>
   );
 }

@@ -1,0 +1,55 @@
+.kinetic-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 24px;
+  background: #171411;
+  color: #f6f0e8;
+}
+
+.kinetic-loader__mark {
+  display: flex;
+  align-items: end;
+  gap: 5px;
+  height: 42px;
+}
+
+.kinetic-loader__mark span {
+  width: 7px;
+  height: 24px;
+  border-radius: 8px;
+  background: #d8875c;
+  animation: kinetic-bounce 0.9s ease-in-out infinite;
+}
+
+.kinetic-loader__mark span:nth-child(2) {
+  height: 38px;
+  animation-delay: 0.12s;
+}
+
+.kinetic-loader__mark span:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+.kinetic-loader__text {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #bdb1a5;
+}
+
+@keyframes kinetic-bounce {
+  0%,
+  100% {
+    transform: scaleY(0.65);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}

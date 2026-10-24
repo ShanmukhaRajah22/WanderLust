@@ -10,6 +10,8 @@ export default {
       '/logout': 'http://localhost:8080',
       '/me': 'http://localhost:8080',
       '/users': 'http://localhost:8080',
+      '/bookings': 'http://localhost:8080',
+      '/ai': 'http://localhost:8080',
     }
   }
 }

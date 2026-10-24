@@ -1,0 +1,14 @@
+.flip-text {
+  display: inline-block;
+  perspective: 600px;
+  cursor: default;
+}
+
+.flip-text__inner {
+  display: inline-block;
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.flip-text.is-flipped .flip-text__inner {
+  transform: rotateX(360deg);
+}

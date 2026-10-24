@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useApp } from "../../context/AppContext";
 import { api } from "../../utils/api";
 import ListingCard from "../../components/includes/ListingCard";
 import ListingMap from "../../components/includes/ListingMap";
 import AiAssistant from "../../components/includes/AiAssistant";
+import { FlipText } from "../../components/ui/flip-text";
+import { KineticTextLoader } from "../../components/ui/kinetic-text-loader";
 import "./ListingIndex.css";
 import "../../context/ColdStartBanner.css";
 
@@ -21,14 +23,11 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
     checkOut: "",
   });
   const [availableIds, setAvailableIds] = useState(null);
-  const [showColdMsg, setShowColdMsg] = useState(false);
+  const listingsSectionRef = useRef(null);
 
   useEffect(() => {
-    if (!loading) return;
-    const t = setTimeout(() => setShowColdMsg(true), 5000);
-    return () => clearTimeout(t);
-  }, [loading]);
-
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, []);
   useEffect(() => {
     api
       .getListings()
@@ -66,6 +65,28 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
     };
   }, [filters.checkIn, filters.checkOut, listings]);
 
+  const scrollToListings = () => {
+    listingsSectionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
+  const submitTextFilter = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      scrollToListings();
+    }
+  };
+
+  const setMapOnly = (event) => {
+    setFilters((current) => ({
+      ...current,
+      mapOnly: event.target.checked,
+    }));
+    scrollToListings();
+  };
+
   const datesAreValid =
     filters.checkIn &&
     filters.checkOut &&
@@ -100,26 +121,29 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
 
   return (
     <>
-      {/* ── HERO ── */}
+      {/* ── LANDING HERO ── */}
       <section className="idx-hero">
-        <div className="idx-hero__content anim-fade-up">
-          <span className="idx-hero__eyebrow">✦ Discover unique stays</span>
+        <div className="idx-hero__content">
+          <span className="idx-hero__eyebrow">Nestly / places to pause</span>
           <h1 className="idx-hero__title">
-            Find your next
+            Go somewhere
             <br />
-            <em>perfect escape</em>
+            <em>worth remembering.</em>
           </h1>
           <p className="idx-hero__sub">
-            From mountain retreats to city lofts — every stay tells a story.
+            Thoughtful stays for slow mornings, new perspectives, and the
+            stories you bring home.
           </p>
+          <FlipText className="idx-hero__flip">Stay curious.</FlipText>
 
           <div className="idx-hero__searchbar">
-            <span className="idx-hero__search-icon">🔍</span>
+            <span className="idx-hero__search-icon" aria-hidden="true">⌕</span>
             <input
               className="idx-hero__search-input"
               placeholder="Search by city, country or name…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={submitTextFilter}
             />
             {search && (
               <button
@@ -135,8 +159,16 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
               placeholder="Location"
               value={filters.location}
               onChange={setFilter("location")}
+              onKeyDown={submitTextFilter}
+              onBlur={scrollToListings}
             />
-            <select value={filters.country} onChange={setFilter("country")}>
+            <select
+              value={filters.country}
+              onChange={(event) => {
+                setFilter("country")(event);
+                scrollToListings();
+              }}
+            >
               <option value="">All countries</option>
               {countries.map((country) => (
                 <option key={country} value={country}>{country}</option>
@@ -148,27 +180,38 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
               placeholder="Max price"
               value={filters.maxPrice}
               onChange={setFilter("maxPrice")}
+              onKeyDown={submitTextFilter}
+              onBlur={scrollToListings}
             />
             <label>
               <input
                 type="checkbox"
                 checked={filters.mapOnly}
-                onChange={(event) =>
-                  setFilters((current) => ({
-                    ...current,
-                    mapOnly: event.target.checked,
-                  }))
-                }
+                onChange={setMapOnly}
               />
               Map locations only
             </label>
             <label>
               Check-in
-              <input type="date" value={filters.checkIn} onChange={setFilter("checkIn")} />
+              <input
+                type="date"
+                value={filters.checkIn}
+                onChange={(event) => {
+                  setFilter("checkIn")(event);
+                  scrollToListings();
+                }}
+              />
             </label>
             <label>
               Check-out
-              <input type="date" value={filters.checkOut} onChange={setFilter("checkOut")} />
+              <input
+                type="date"
+                value={filters.checkOut}
+                onChange={(event) => {
+                  setFilter("checkOut")(event);
+                  scrollToListings();
+                }}
+              />
             </label>
             <button type="button" className="btn btn-ghost btn-sm" onClick={clearFilters}>
               Clear filters
@@ -176,36 +219,6 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
           </div>
         </div>
 
-        <div className="idx-hero__visual" aria-hidden>
-          <div className="idx-hero__v-card idx-hero__v-card--1">
-            <div className="idx-hero__v-card-img">🏔️</div>
-            <div className="idx-hero__v-card-body">
-              <div className="idx-hero__v-card-title">Mountain Retreat</div>
-              <div className="idx-hero__v-card-loc">📍 Manali, India</div>
-            </div>
-          </div>
-          <div className="idx-hero__v-card idx-hero__v-card--2">
-            <div className="idx-hero__v-card-img">🏖️</div>
-            <div className="idx-hero__v-card-body">
-              <div className="idx-hero__v-card-title">Beach Villa</div>
-              <div className="idx-hero__v-card-loc">📍 Goa, India</div>
-            </div>
-          </div>
-          <div className="idx-hero__v-card idx-hero__v-card--3">
-            <div className="idx-hero__v-card-img">🏙️</div>
-            <div className="idx-hero__v-card-body">
-              <div className="idx-hero__v-card-title">City Loft</div>
-              <div className="idx-hero__v-card-loc">📍 Mumbai, India</div>
-            </div>
-          </div>
-          <div className="idx-hero__v-float">
-            <span>🌍</span>
-            <div>
-              <div className="idx-hero__v-num">{listings.length}+</div>
-              <div className="idx-hero__v-label">Unique stays</div>
-            </div>
-          </div>
-        </div>
       </section>
 
       <AiAssistant onSelectListing={onSelectListing} />
@@ -215,7 +228,7 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
       )}
 
       {/* ── GRID ── */}
-      <section className="idx-listings">
+      <section className="idx-listings" ref={listingsSectionRef}>
         <div className="container">
           <div className="idx-listings__header">
             <h2 className="idx-listings__title">All Listings</h2>
@@ -225,25 +238,17 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
                 : `${filtered.length} place${filtered.length !== 1 ? "s" : ""}`}
             </span>
           </div>
+          {(search || filters.location || filters.country || filters.maxPrice) && (
+            <p className="idx-listings__active-filter">
+              Showing results for{" "}
+              <strong>
+                {search || filters.location || filters.country || `under ₹${filters.maxPrice}`}
+              </strong>
+            </p>
+          )}
 
           {loading ? (
-            <div className="loading-wrap">
-              <div className="spinner" />
-              <span>Loading listings…</span>
-              {showColdMsg && (
-                <div
-                  className="cold-start-banner anim-fade-in"
-                  style={{ marginTop: "1rem" }}
-                >
-                  <span className="cold-start-banner__icon">ℹ️</span>
-                  <p>
-                    Our backend is hosted on Render's free tier and sleeps after
-                    inactivity. It's waking up now — this may take
-                    <strong> 40–60 seconds</strong>. Thanks for your patience!
-                  </p>
-                </div>
-              )}
-            </div>
+            <KineticTextLoader text="Finding stays" />
           ) : filtered.length === 0 ? (
             <div className="empty-state">
               <div className="empty-state__icon">🔍</div>

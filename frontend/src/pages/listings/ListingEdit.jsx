@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useApp } from "../../context/AppContext";
 import { api } from "../../utils/api";
+import PageLoader from "../../components/ui/page-loader";
 import "./ListingForm.css";
 
 export default function ListingEdit({ listingId, onNavigate }) {
@@ -32,13 +33,7 @@ export default function ListingEdit({ listingId, onNavigate }) {
       });
   }, [listingId]);
 
-  if (fetching || !form)
-    return (
-      <div className="loading-wrap">
-        <div className="spinner" />
-        <span>Loading…</span>
-      </div>
-    );
+  if (fetching || !form) return <PageLoader text="Loading your listing" />;
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 

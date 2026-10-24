@@ -7,7 +7,7 @@ import {
 } from "react";
 import React from "react";
 import { api } from "../utils/api";
-import "./ColdStartBanner.css";
+import { KineticTextLoader } from "../components/ui/kinetic-text-loader";
 
 const AppContext = createContext(null);
 
@@ -41,31 +41,8 @@ export function AppProvider({ children }) {
     showFlash("Logged out successfully. See you soon!");
   }, [showFlash]);
 
-  const [showColdMsg, setShowColdMsg] = useState(false);
-
-  useEffect(() => {
-    if (!loading) return;
-    const t = setTimeout(() => setShowColdMsg(true), 3000);
-    return () => clearTimeout(t);
-  }, [loading]);
-
   if (loading) {
-    return (
-      <div className="cold-start-screen">
-        <div className="spinner" />
-        <p className="cold-start-screen__text">Connecting to server…</p>
-        {showColdMsg && (
-          <div className="cold-start-banner anim-fade-in">
-            <span className="cold-start-banner__icon">ℹ️</span>
-            <p>
-              Our backend is hosted on Render's free tier and sleeps after
-              inactivity. It's waking up now — this may take
-              <strong> 40–60 seconds</strong>. Thanks for your patience!
-            </p>
-          </div>
-        )}
-      </div>
-    );
+    return <KineticTextLoader text="Connecting to Nestly" />;
   }
 
   return (

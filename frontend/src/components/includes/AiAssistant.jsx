@@ -2,6 +2,9 @@ import { useState } from "react";
 import { api } from "../../utils/api";
 import "./AiAssistant.css";
 
+const cleanMessage = (message) =>
+  message.replace(/\*\*(.*?)\*\*/g, "$1").replace(/^[-*]\s+/gm, "");
+
 const suggestions = [
   "Find stays in Bali",
   "Show places under ₹2000",
@@ -79,7 +82,7 @@ export default function AiAssistant({ onSelectListing }) {
       <div className="container">
         <div className="ai-assistant__header">
           <div>
-            <span className="ai-assistant__eyebrow">✦ WanderLust AI</span>
+            <span className="ai-assistant__eyebrow">✦ Nestly AI</span>
             <h2>Find a stay by asking</h2>
             <p>Try a place, price, or type of getaway in plain English.</p>
           </div>
@@ -91,7 +94,7 @@ export default function AiAssistant({ onSelectListing }) {
             <div className="ai-assistant__welcome">
               <span>👋</span>
               <p>
-                Hi! I can search the real WanderLust listings for you.
+                Hi! I can search the real Nestly listings for you.
               </p>
             </div>
           )}
@@ -102,7 +105,7 @@ export default function AiAssistant({ onSelectListing }) {
               key={`${message.role}-${index}`}
             >
               <p className={message.error ? "ai-message__error" : ""}>
-                {message.content}
+                {cleanMessage(message.content)}
               </p>
               {message.listings?.length > 0 && (
                 <div className="ai-results">
@@ -150,7 +153,7 @@ export default function AiAssistant({ onSelectListing }) {
             maxLength={1000}
             onChange={(event) => setInput(event.target.value)}
             placeholder="Ask about stays, places, or prices…"
-            aria-label="Ask WanderLust AI"
+            aria-label="Ask Nestly AI"
           />
           <button className="btn btn-dark" disabled={loading || !input.trim()}>
             {loading ? "Searching…" : "Ask AI"}

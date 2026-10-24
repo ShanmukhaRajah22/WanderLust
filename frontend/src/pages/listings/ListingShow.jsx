@@ -4,7 +4,10 @@ import { api } from "../../utils/api";
 import ConfirmDialog from "../../components/includes/ConfirmDialog";
 import ListingMap from "../../components/includes/ListingMap";
 import BookingForm from "./BookingForm";
+import { Avatar, AvatarBadge, AvatarFallback } from "../../components/ui/avatar";
+import { PenIcon } from "../../components/ui/icon-button";
 import "./ListingShow.css";
+import PageLoader from "../../components/ui/page-loader";
 
 const fmt = (n) => "₹ " + Number(n).toLocaleString("en-IN");
 const stars = (r) => "★".repeat(r) + "☆".repeat(5 - r);
@@ -50,7 +53,9 @@ function ReviewForm({ onSubmit }) {
 
   return (
     <form className="review-form" onSubmit={handle} noValidate>
-      <h4 className="review-form__title">Leave a Review</h4>
+      <h4 className="review-form__title">
+        <PenIcon size={16} /> Leave a Review
+      </h4>
       <div className="form-group">
         <label className="form-label">Rating</label>
         <StarPicker value={rating} onChange={setRating} />
@@ -85,9 +90,10 @@ function ReviewCard({ review, canDelete, onDelete, style }) {
   return (
     <div className="review-card anim-fade-up" style={style}>
       <div className="review-card__head">
-        <div className="review-card__avatar">
-          {ini(review.author?.username)}
-        </div>
+        <Avatar>
+          <AvatarFallback>{ini(review.author?.username)}</AvatarFallback>
+          <AvatarBadge />
+        </Avatar>
         <div>
           <div className="review-card__author">
             @{review.author?.username ?? "Anonymous"}
@@ -139,13 +145,7 @@ export default function ListingShow({ listingId, onNavigate }) {
       .finally(() => setLoading(false));
   }, [listingId]);
 
-  if (loading)
-    return (
-      <div className="loading-wrap">
-        <div className="spinner" />
-        <span>Loading…</span>
-      </div>
-    );
+  if (loading) return <PageLoader text="Opening this stay" />;
   if (!listing)
     return (
       <div className="empty-state">
@@ -260,9 +260,10 @@ export default function ListingShow({ listingId, onNavigate }) {
       {/* Owner */}
       {listing.owner && (
         <div className="show-page__owner">
-          <div className="show-page__owner-avatar">
-            {ini(listing.owner.username)}
-          </div>
+          <Avatar className="show-page__owner-avatar">
+            <AvatarFallback>{ini(listing.owner.username)}</AvatarFallback>
+            <AvatarBadge />
+          </Avatar>
           <div className="show-page__owner-details">
             <div className="show-page__owner-info">
               <div className="show-page__owner-label">Hosted by</div>

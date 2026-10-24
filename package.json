@@ -1,5 +1,5 @@
 {
-  "name": "wanderlust",
+  "name": "nestly",
   "version": "1.0.0",
   "private": true,
   "description": "A full-stack travel listing platform built with Express, MongoDB, and React.",
@@ -15,7 +15,18 @@
     "build": "npm run install:all && npm run build:frontend",
     "start": "cd backend && npm start"
   },
-  "keywords": ["travel", "listings", "express", "react", "mongodb"],
+  "keywords": [
+    "travel",
+    "listings",
+    "express",
+    "react",
+    "mongodb"
+  ],
   "author": "Shanmukha Rajah",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "date-fns": "^4.4.0",
+    "lucide-react": "^1.61.0",
+    "react-day-picker": "^10.0.2"
+  }
 }

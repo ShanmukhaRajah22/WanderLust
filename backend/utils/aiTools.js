@@ -21,7 +21,7 @@ const textSearch = (value) => ({
 
 export const createListingSearchTool = (saveResults) =>
     tool({
-        description: "Find real WanderLust listings using location, country, keyword, and price filters.",
+        description: "Find real Nestly listings using location, country, keyword, and price filters.",
         inputSchema: searchInput,
         execute: async ({ location, country, keyword, minPrice, maxPrice }) => {
             const query = {};
@@ -46,6 +46,7 @@ export const createListingSearchTool = (saveResults) =>
 
             const listings = await Listing.find(query)
                 .select("_id title location country price image")
+                .sort({ price: 1, _id: 1 })
                 .limit(12)
                 .lean();
 
@@ -73,16 +74,29 @@ export const createAvailabilityTool = (saveResult) =>
                     .string()
                     .optional()
                     .describe("The exact listing title to check"),
-                checkIn: z.coerce.date().describe("The requested check-in date"),
-                checkOut: z.coerce.date().describe("The requested check-out date"),
+                checkIn: z.string().describe("The requested check-in date in YYYY-MM-DD format"),
+                checkOut: z.string().describe("The requested check-out date in YYYY-MM-DD format"),
             })
             .refine(({ listingId, listingTitle }) => listingId || listingTitle, {
                 message: "A listing ID or title is required",
-            })
-            .refine(({ checkIn, checkOut }) => checkOut > checkIn, {
-                message: "Check-out must be after check-in",
             }),
         execute: async ({ listingId, listingTitle, checkIn, checkOut }) => {
+            const checkInDate = new Date(`${checkIn}T00:00:00.000Z`);
+            const checkOutDate = new Date(`${checkOut}T00:00:00.000Z`);
+
+            if (
+                Number.isNaN(checkInDate.getTime()) ||
+                Number.isNaN(checkOutDate.getTime()) ||
+                checkOutDate <= checkInDate
+            ) {
+                const result = {
+                    available: false,
+                    message: "Please provide valid dates with check-out after check-in.",
+                };
+                saveResult(result);
+                return result;
+            }
+
             const listing = listingId && mongoose.isValidObjectId(listingId)
                 ? await Listing.findById(listingId).select("title")
                 : await Listing.findOne({ title: listingTitle }).select("title");
@@ -95,8 +109,8 @@ export const createAvailabilityTool = (saveResult) =>
             const conflict = await Booking.findOne({
                 listing: listing._id,
                 status: "confirmed",
-                checkIn: { $lt: checkOut },
-                checkOut: { $gt: checkIn },
+                checkIn: { $lt: checkOutDate },
+                checkOut: { $gt: checkInDate },
             });
 
             const result = {

@@ -46,7 +46,7 @@ export default function Signup({ onNavigate }) {
       <div className="auth-card">
         <div className="auth-card__logo">
           {/* <span className="auth-card__logo-pin">⌂</span> */}
-          Wanderlust
+          Nestly
         </div>
         <h1 className="auth-card__title">Create account</h1>
         <p className="auth-card__sub">

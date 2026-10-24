@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApp } from "../../context/AppContext";
 import { api } from "../../utils/api";
+import PageLoader from "../../components/ui/page-loader";
 import "./MyBookings.css";
 
 const date = (value) => new Date(value).toLocaleDateString("en-IN");
@@ -39,12 +40,7 @@ export default function MyBookings({ onNavigate }) {
   };
 
   if (loading) {
-    return (
-      <div className="loading-wrap">
-        <div className="spinner" />
-        <span>Loading bookings...</span>
-      </div>
-    );
+    return <PageLoader text="Loading your bookings" />;
   }
 
   return (
@@ -100,7 +96,7 @@ export default function MyBookings({ onNavigate }) {
                 onClick={() => cancel(booking)}
                 disabled={cancelling === booking._id}
               >
-                {cancelling === booking._id ? "Cancelling..." : "Cancel booking"}
+                {cancelling === booking._id ? "Canceling..." : "Cancel booking"}
               </button>
             </article>
           ))}

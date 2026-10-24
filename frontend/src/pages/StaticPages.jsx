@@ -58,7 +58,7 @@ export function PrivacyPage({ onNavigate }) {
         <h2>5. Contact Us</h2>
         <p>
           If you have questions about this Privacy Policy, contact us at{" "}
-          <strong>privacy@wanderlust.example.com</strong>
+          <strong>privacy@nestly.example.com</strong>
         </p>
       </div>
     </div>
@@ -81,13 +81,13 @@ export function TermsPage({ onNavigate }) {
       <div className="static-doc__body">
         <h2>1. Acceptance of Terms</h2>
         <p>
-          By accessing or using the Wanderlust platform, you agree to be bound
+          By accessing or using the Nestly platform, you agree to be bound
           by these Terms of Service. If you do not agree to these terms, please
           do not use our services.
         </p>
         <h2>2. Description of Service</h2>
         <p>
-          Wanderlust is a platform that allows property owners to list their
+          Nestly is a platform that allows property owners to list their
           spaces for short-term rental and enables travellers to discover and
           book those spaces.
         </p>
@@ -101,18 +101,18 @@ export function TermsPage({ onNavigate }) {
         <p>
           Property owners are solely responsible for the accuracy of their
           listings, including pricing, availability, and property descriptions.
-          Wanderlust reserves the right to remove any listing that violates
+          Nestly reserves the right to remove any listing that violates
           these terms.
         </p>
         <h2>5. Limitation of Liability</h2>
         <p>
-          Wanderlust is not liable for any indirect, incidental, or
+          Nestly is not liable for any indirect, incidental, or
           consequential damages arising from your use of the platform.
         </p>
         <h2>6. Contact</h2>
         <p>
           For questions about these Terms, contact us at{" "}
-          <strong>legal@wanderlust.example.com</strong>
+          <strong>legal@nestly.example.com</strong>
         </p>
       </div>
     </div>

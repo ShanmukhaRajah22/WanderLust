@@ -43,7 +43,7 @@ export default function Login({ onNavigate }) {
       <div className="auth-card">
         <div className="auth-card__logo">
           {/* <span className="auth-card__logo-pin">⌂</span> */}
-          Wanderlust
+          Nestly
         </div>
         <h1 className="auth-card__title">Welcome back</h1>
         <p className="auth-card__sub">

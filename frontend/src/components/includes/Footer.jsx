@@ -7,7 +7,7 @@ export default function Footer({ onNavigate }) {
         <div className="footer__brand">
           <div className="footer__logo">
             {/* <span className="footer__logo-pin">⌂</span> */}
-            Wanderlust
+            Nestly
           </div>
           <p className="footer__tagline">
             Find your perfect escape, anywhere in the world.
@@ -40,7 +40,7 @@ export default function Footer({ onNavigate }) {
 
       <div className="footer__bottom">
         <div className="container">
-          © {new Date().getFullYear()} Wanderlust · All rights reserved
+          © {new Date().getFullYear()} Nestly · All rights reserved
         </div>
       </div>
     </footer>
