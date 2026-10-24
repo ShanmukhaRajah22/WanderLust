@@ -16,7 +16,10 @@ import cors from "cors";
 import { fileURLToPath } from "url";
 import listingRouter from "./routes/listing.js";
 import reviewRouter from "./routes/review.js";
+import bookingRouter from "./routes/booking.js";
 import userRouter from "./routes/user.js";
+import aiRouter from "./routes/ai.js";
+import bookingsRouter from "./routes/bookings.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -153,6 +156,9 @@ app.get("/terms", (req, res, next) => {
 // routers added
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
+app.use("/listings/:id/bookings", bookingRouter);
+app.use("/ai", aiRouter);
+app.use("/bookings", bookingsRouter);
 app.use("/", userRouter);
 
 

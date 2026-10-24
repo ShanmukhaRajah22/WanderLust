@@ -50,6 +50,12 @@ export default function Navbar({ onNavigate }) {
                 </div>
                 <span className="navbar__uname">{currentUser.username}</span>
               </button>
+              <button
+                className="navbar__link"
+                onClick={() => go("bookings")}
+              >
+                My bookings
+              </button>
               <button className="btn btn-outline btn-sm" onClick={handleLogout}>
                 Logout
               </button>
@@ -104,6 +110,12 @@ export default function Navbar({ onNavigate }) {
                   {ini(currentUser.username)}
                 </div>
                 {currentUser.username}
+              </button>
+              <button
+                className="navbar__drawer-link"
+                onClick={() => go("bookings")}
+              >
+                My bookings
               </button>
               <button
                 className="navbar__drawer-link navbar__drawer-link--danger"

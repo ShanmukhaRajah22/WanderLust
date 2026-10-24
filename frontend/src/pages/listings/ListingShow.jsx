@@ -3,6 +3,7 @@ import { useApp } from "../../context/AppContext";
 import { api } from "../../utils/api";
 import ConfirmDialog from "../../components/includes/ConfirmDialog";
 import ListingMap from "../../components/includes/ListingMap";
+import BookingForm from "./BookingForm";
 import "./ListingShow.css";
 
 const fmt = (n) => "₹ " + Number(n).toLocaleString("en-IN");
@@ -248,6 +249,8 @@ export default function ListingShow({ listingId, onNavigate }) {
           title="Where you'll stay"
         />
       )}
+
+      <BookingForm listing={listing} onNavigate={onNavigate} />
 
       {/* Description */}
       {listing.description && (

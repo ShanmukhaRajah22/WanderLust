@@ -55,18 +55,20 @@ export const parseFormData = (req, res, next) => {
 
 
 export const validateListing = (req, res, next) => {
-    const { error } = listingSchema.validate(req.body);
-    if (error) {
-        throw new ExpressError(400, error.details[0].message);
+    const result = listingSchema.safeParse(req.body);
+    if (!result.success) {
+        throw new ExpressError(400, result.error.issues[0]?.message || "Invalid listing data");
     }
+    req.body = result.data;
     next();
 };
 
 export const validateReview = (req, res, next) => {
-    const { error } = reviewSchema.validate(req.body);
-    if (error) {
-        throw new ExpressError(400, error.details[0].message);
+    const result = reviewSchema.safeParse(req.body);
+    if (!result.success) {
+        throw new ExpressError(400, result.error.issues[0]?.message || "Invalid review data");
     }
+    req.body = result.data;
     next();
 };
 

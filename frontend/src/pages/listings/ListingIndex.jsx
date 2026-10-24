@@ -3,6 +3,7 @@ import { useApp } from "../../context/AppContext";
 import { api } from "../../utils/api";
 import ListingCard from "../../components/includes/ListingCard";
 import ListingMap from "../../components/includes/ListingMap";
+import AiAssistant from "../../components/includes/AiAssistant";
 import "./ListingIndex.css";
 import "../../context/ColdStartBanner.css";
 
@@ -11,6 +12,15 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState({
+    country: "",
+    location: "",
+    maxPrice: "",
+    mapOnly: false,
+    checkIn: "",
+    checkOut: "",
+  });
+  const [availableIds, setAvailableIds] = useState(null);
   const [showColdMsg, setShowColdMsg] = useState(false);
 
   useEffect(() => {
@@ -27,12 +37,66 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    if (!filters.checkIn || !filters.checkOut || filters.checkOut <= filters.checkIn) {
+      return;
+    }
+
+    let active = true;
+    Promise.all(
+      listings.map((listing) =>
+        api
+          .getBookings(listing._id)
+          .then((bookings) => {
+            const available = !bookings.some(
+              (booking) =>
+                new Date(booking.checkIn) < new Date(`${filters.checkOut}T00:00:00`) &&
+                new Date(booking.checkOut) > new Date(`${filters.checkIn}T00:00:00`),
+            );
+            return available ? listing._id : null;
+          })
+          .catch(() => null),
+      ),
+    ).then((ids) => {
+      if (active) setAvailableIds(new Set(ids.filter(Boolean)));
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [filters.checkIn, filters.checkOut, listings]);
+
+  const datesAreValid =
+    filters.checkIn &&
+    filters.checkOut &&
+    filters.checkOut > filters.checkIn;
   const filtered = listings.filter((l) =>
-    [l.title, l.location, l.country]
-      .join(" ")
-      .toLowerCase()
-      .includes(search.toLowerCase()),
+    [l.title, l.location, l.country].join(" ").toLowerCase().includes(search.toLowerCase()) &&
+    (!filters.country || l.country === filters.country) &&
+    (!filters.location || l.location.toLowerCase().includes(filters.location.toLowerCase())) &&
+    (!filters.maxPrice || Number(l.price) <= Number(filters.maxPrice)) &&
+    (!filters.mapOnly || l.geometry?.coordinates?.length === 2) &&
+    (!datesAreValid || !availableIds || availableIds.has(l._id)),
   );
+
+  const countries = [...new Set(listings.map((listing) => listing.country))].sort();
+  const setFilter = (name) => (event) => {
+    if (name === "checkIn" || name === "checkOut") {
+      setAvailableIds(null);
+    }
+    setFilters((current) => ({ ...current, [name]: event.target.value }));
+  };
+  const clearFilters = () => {
+    setSearch("");
+    setFilters({
+      country: "",
+      location: "",
+      maxPrice: "",
+      mapOnly: false,
+      checkIn: "",
+      checkOut: "",
+    });
+  };
 
   return (
     <>
@@ -65,6 +129,50 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
                 ×
               </button>
             )}
+          </div>
+          <div className="idx-filters">
+            <input
+              placeholder="Location"
+              value={filters.location}
+              onChange={setFilter("location")}
+            />
+            <select value={filters.country} onChange={setFilter("country")}>
+              <option value="">All countries</option>
+              {countries.map((country) => (
+                <option key={country} value={country}>{country}</option>
+              ))}
+            </select>
+            <input
+              type="number"
+              min="0"
+              placeholder="Max price"
+              value={filters.maxPrice}
+              onChange={setFilter("maxPrice")}
+            />
+            <label>
+              <input
+                type="checkbox"
+                checked={filters.mapOnly}
+                onChange={(event) =>
+                  setFilters((current) => ({
+                    ...current,
+                    mapOnly: event.target.checked,
+                  }))
+                }
+              />
+              Map locations only
+            </label>
+            <label>
+              Check-in
+              <input type="date" value={filters.checkIn} onChange={setFilter("checkIn")} />
+            </label>
+            <label>
+              Check-out
+              <input type="date" value={filters.checkOut} onChange={setFilter("checkOut")} />
+            </label>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={clearFilters}>
+              Clear filters
+            </button>
           </div>
         </div>
 
@@ -99,6 +207,8 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
           </div>
         </div>
       </section>
+
+      <AiAssistant onSelectListing={onSelectListing} />
 
       {!loading && filtered.length > 0 && (
         <ListingMap listings={filtered} onSelectListing={onSelectListing} />

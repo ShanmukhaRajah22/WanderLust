@@ -39,7 +39,12 @@ A full-stack travel accommodation listing platform where users can discover, sha
 - **Authorization** — Only listing owners can edit/delete their listings; only review authors can delete their reviews
 - **Responsive Design** — Mobile-first UI with collapsible navbar, lazy-loaded images, and smooth animations
 - **Flash Notifications** — Toast-style feedback for all user actions
-- **Form Validation** — Server-side Joi validation and client-side input checks
+- **Form Validation** — Server-side Zod validation and client-side input checks
+- **Bookings** — Date-range availability checks, booking confirmation, and cancellation
+- **AI Listing Search** — Natural-language listing search with OpenRouter and a validated MongoDB tool
+- **Advanced Filters** — Filter by location, country, price, map coordinates, and booking dates
+- **Availability Assistant** — Ask the AI to check booking availability from MongoDB
+- **Booking Performance** — Indexed booking queries and protected AI request limits
 
 ---
 
@@ -53,7 +58,8 @@ A full-stack travel accommodation listing platform where users can discover, sha
 | **MongoDB + Mongoose 8** | Database & ODM                  |
 | **Passport.js**          | Authentication (local strategy) |
 | **Cloudinary + Multer**  | Image upload & storage          |
-| **Joi**                  | Request body validation         |
+| **Zod**                  | Request body validation          |
+| **Vercel AI SDK + OpenRouter** | Natural-language listing search |
 | **express-session**      | Session management              |
 | **connect-mongo**        | MongoDB session store           |
 
@@ -165,6 +171,8 @@ SECRET=your_session_secret_here
 CLOUD_NAME=your_cloudinary_cloud_name
 CLOUD_API_KEY=your_cloudinary_api_key
 CLOUD_API_SECRET=your_cloudinary_api_secret
+OPENROUTER_API_KEY=your_openrouter_api_key
+OPENROUTER_MODEL=openrouter/free
 ```
 
 > **Note:** For local development, you can use `mongodb://127.0.0.1:27017/wanderlust` as the `ATLASDB_URL`.
@@ -223,6 +231,24 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 | ------ | --------------------------------- | --------------- | ------ |
 | POST   | `/listings/:id/reviews`           | Add a review    | Yes    |
 | DELETE | `/listings/:id/reviews/:reviewId` | Delete a review | Author |
+
+### Bookings
+
+| Method | Endpoint | Description | Auth |
+| ------ | -------- | ----------- | ---- |
+| GET | `/listings/:id/bookings` | Get booked date ranges | No |
+| POST | `/listings/:id/bookings` | Create a booking | Yes |
+| DELETE | `/listings/:id/bookings/:bookingId` | Cancel your booking | Yes |
+
+### AI Search
+
+| Method | Endpoint | Description | Auth |
+| ------ | -------- | ----------- | ---- |
+| POST | `/ai/chat` | Search listings with natural language | No |
+
+The AI endpoint accepts up to 12 messages, limits each message to 1,000
+characters, allows two tool steps per request, and applies a small per-IP
+request limit for the free OpenRouter model.
 
 ---
 

@@ -223,6 +223,38 @@
   color: var(--ink-light);
 }
 
+.idx-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+  margin: 0 0 24px;
+  padding: 14px;
+  border: 1px solid var(--dust);
+  border-radius: var(--radius);
+  background: var(--dust-light);
+}
+.idx-filters input,
+.idx-filters select {
+  min-width: 130px;
+  padding: 9px 10px;
+  border: 1px solid var(--dust);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+}
+.idx-filters label {
+  display: grid;
+  gap: 4px;
+  color: var(--ink-light);
+  font-size: 11px;
+}
+.idx-filters label input[type="checkbox"] {
+  min-width: auto;
+}
+
 .idx-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));

@@ -9,6 +9,7 @@ import ListingEdit from "./pages/listings/ListingEdit";
 import Login from "./pages/users/Login";
 import Signup from "./pages/users/Signup";
 import Profile from "./pages/users/Profile";
+import MyBookings from "./pages/users/MyBookings";
 import { ErrorPage, PrivacyPage, TermsPage } from "./pages/StaticPages";
 
 import "./index.css";
@@ -56,6 +57,8 @@ function Router() {
         return <Signup onNavigate={navigate} />;
       case "profile":
         return <Profile onNavigate={navigate} />;
+      case "bookings":
+        return <MyBookings onNavigate={navigate} />;
       case "privacy":
         return <PrivacyPage onNavigate={navigate} />;
       case "terms":

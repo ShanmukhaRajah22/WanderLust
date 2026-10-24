@@ -30,6 +30,22 @@ export const api = {
   createListing: (fd) => fetch(`${BASE}/listings`, { method: "POST", credentials: "include", body: fd }).then(async r => { if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.message || `HTTP ${r.status}`); } return r.json(); }),
   updateListing: (id, fd) => fetch(`${BASE}/listings/${id}?_method=PUT`, { method: "POST", credentials: "include", body: fd }).then(async r => { if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.message || `HTTP ${r.status}`); } return r.json(); }),
   deleteListing: (id) => req(`/listings/${id}`, { method: "DELETE" }),
+  getBookings: (id) => req(`/listings/${id}/bookings`),
+  createBooking: (id, data) =>
+    req(`/listings/${id}/bookings`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  deleteBooking: (listingId, bookingId) =>
+    req(`/listings/${listingId}/bookings/${bookingId}`, {
+      method: "DELETE",
+    }),
+  getMyBookings: () => req("/bookings/me"),
+  aiChat: (messages) =>
+    req("/ai/chat", {
+      method: "POST",
+      body: JSON.stringify({ messages }),
+    }),
 
   // Reviews
   createReview: (lid, data) => req(`/listings/${lid}/reviews`, { method: "POST", body: JSON.stringify(data) }),
