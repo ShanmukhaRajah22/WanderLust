@@ -15,6 +15,13 @@ const nightsBetween = (checkIn, checkOut) => {
   );
 };
 
+const formatBookingDate = (value) => {
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(value)
+    ? new Date(`${value}T00:00:00`)
+    : new Date(value);
+  return date.toLocaleDateString();
+};
+
 function BookingSuccess({ booking, listing, onClose }) {
   useEffect(() => {
     confetti({
@@ -37,11 +44,11 @@ function BookingSuccess({ booking, listing, onClose }) {
         <div className="booking-success__dates">
           <div>
             <span>Check-in</span>
-            <strong>{new Date(`${booking.checkIn}T00:00:00`).toLocaleDateString()}</strong>
+            <strong>{formatBookingDate(booking.checkIn)}</strong>
           </div>
           <div>
             <span>Check-out</span>
-            <strong>{new Date(`${booking.checkOut}T00:00:00`).toLocaleDateString()}</strong>
+            <strong>{formatBookingDate(booking.checkOut)}</strong>
           </div>
         </div>
         <p className="booking-success__note">
@@ -69,11 +76,11 @@ function BookingCancelled({ booking, listing, onClose }) {
         <div className="booking-success__dates">
           <div>
             <span>Check-in</span>
-            <strong>{new Date(`${booking.checkIn}T00:00:00`).toLocaleDateString()}</strong>
+            <strong>{formatBookingDate(booking.checkIn)}</strong>
           </div>
           <div>
             <span>Check-out</span>
-            <strong>{new Date(`${booking.checkOut}T00:00:00`).toLocaleDateString()}</strong>
+            <strong>{formatBookingDate(booking.checkOut)}</strong>
           </div>
         </div>
         <p className="booking-success__note">
