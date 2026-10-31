@@ -118,6 +118,8 @@ export default function BookingForm({ listing, onNavigate }) {
 
   useEffect(() => {
     loadBookings();
+    const refresh = window.setInterval(loadBookings, 5000);
+    return () => window.clearInterval(refresh);
   }, [loadBookings]);
 
   const nights = nightsBetween(dates.checkIn, dates.checkOut);
@@ -209,7 +211,7 @@ export default function BookingForm({ listing, onNavigate }) {
                         room.totalRooms - getOverlappingBookings(room.roomType),
                         0,
                       )} available`
-                    : `${room.totalRooms} rooms total`}
+                    : "select dates"}
                   )
                 </option>
               ))}
