@@ -117,9 +117,18 @@ export default function BookingForm({ listing, onNavigate }) {
   );
 
   useEffect(() => {
-    loadBookings();
-    const refresh = window.setInterval(loadBookings, 5000);
-    return () => window.clearInterval(refresh);
+    const refreshBookings = () => {
+      if (!document.hidden) loadBookings();
+    };
+
+    refreshBookings();
+    const refresh = window.setInterval(refreshBookings, 30000);
+    document.addEventListener("visibilitychange", refreshBookings);
+
+    return () => {
+      window.clearInterval(refresh);
+      document.removeEventListener("visibilitychange", refreshBookings);
+    };
   }, [loadBookings]);
 
   const nights = nightsBetween(dates.checkIn, dates.checkOut);
