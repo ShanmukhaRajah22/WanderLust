@@ -22,7 +22,11 @@ export default function ListingCard({ listing, onClick, style }) {
         <p className="lcard__location">
           📍 {listing.location}, {listing.country}
         </p>
-        <p className="lcard__room-type">{listing.roomType || "Private room"}</p>
+        <p className="lcard__room-type">
+          {listing.roomInventory?.length > 1
+            ? `${listing.roomInventory.length} room types`
+            : listing.roomType || "Room type selected at booking"}
+        </p>
         {listing.amenities?.length > 0 && (
           <div className="lcard__amenities">
             {listing.amenities.slice(0, 3).map((amenity) => (

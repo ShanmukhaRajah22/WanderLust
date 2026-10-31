@@ -251,7 +251,12 @@ export default function ListingShow({ listingId, onNavigate }) {
         </div>
         <div className="show-page__info-card">
           <div className="show-page__info-label">Room type</div>
-          <div className="show-page__info-val">🛏️ {listing.roomType || "Private room"}</div>
+          <div className="show-page__info-val">
+            🛏️{" "}
+            {listing.roomInventory?.length > 1
+              ? `${listing.roomInventory.length} room types available`
+              : listing.roomType || "Room type selected at booking"}
+          </div>
         </div>
       </div>
 

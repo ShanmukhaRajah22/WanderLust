@@ -121,6 +121,19 @@ export default function BookingForm({ listing, onNavigate }) {
   }, [loadBookings]);
 
   const nights = nightsBetween(dates.checkIn, dates.checkOut);
+  const selectedRoom = roomOptions.find((room) => room.roomType === roomType);
+  const getOverlappingBookings = (type) => {
+    if (!nights) return 0;
+    return bookings.filter(
+      (booking) =>
+        booking.roomType === type &&
+        new Date(booking.checkIn) < new Date(`${dates.checkOut}T00:00:00`) &&
+        new Date(booking.checkOut) > new Date(`${dates.checkIn}T00:00:00`),
+    ).length;
+  };
+  const remainingRooms = selectedRoom
+    ? Math.max(selectedRoom.totalRooms - getOverlappingBookings(roomType), 0)
+    : 0;
   const total = useMemo(
     () => nights * Number(listing.price || 0),
     [nights, listing.price],
@@ -181,9 +194,8 @@ export default function BookingForm({ listing, onNavigate }) {
 
       <form onSubmit={submit}>
         <DateRangePicker value={dates} onChange={setDates} />
-        {roomOptions.length > 1 && (
-          <label className="form-group">
-            <span className="form-label">Room type</span>
+        <label className="form-group">
+            <span className="form-label">Choose a room type</span>
             <select
               className="form-input"
               value={roomType}
@@ -191,12 +203,25 @@ export default function BookingForm({ listing, onNavigate }) {
             >
               {roomOptions.map((room) => (
                 <option key={room.roomType} value={room.roomType}>
-                  {room.roomType} ({room.totalRooms} rooms)
+                  {room.roomType} (
+                  {nights > 0
+                    ? `${Math.max(
+                        room.totalRooms - getOverlappingBookings(room.roomType),
+                        0,
+                      )} available`
+                    : `${room.totalRooms} rooms total`}
+                  )
                 </option>
               ))}
             </select>
+            {nights > 0 && (
+              <span className="form-hint">
+                {remainingRooms}{" "}
+                {remainingRooms === 1 ? "room" : "rooms"} available for these
+                dates
+              </span>
+            )}
           </label>
-        )}
 
         {nights > 0 && (
           <div className="booking-card__summary">
