@@ -3,6 +3,23 @@ import Listing from "../models/listing.js";
 import ExpressError from "../utils/ExpressError.js";
 import { bookingSchema } from "../schema.js";
 
+const bookingLocks = new Map();
+
+const withBookingLock = async (key, action) => {
+    const previous = bookingLocks.get(key) || Promise.resolve();
+    const current = previous.then(action, action);
+    const tracked = current.finally(() => {
+        if (bookingLocks.get(key) === tracked) bookingLocks.delete(key);
+    });
+    bookingLocks.set(key, tracked);
+    return current;
+};
+
+const getRoomCapacity = (listing, roomType) => {
+    const inventory = listing.roomInventory?.find((room) => room.roomType === roomType);
+    return inventory?.totalRooms || (listing.roomType === roomType ? 1 : 0);
+};
+
 export const listBookings = async (req, res) => {
     const listing = await Listing.findById(req.params.id).select("_id");
     if (!listing) {
@@ -13,7 +30,7 @@ export const listBookings = async (req, res) => {
         listing: listing._id,
         status: "confirmed",
     })
-        .select("checkIn checkOut guest")
+        .select("checkIn checkOut guest roomType")
         .sort({ checkIn: 1 });
 
     res.json(
@@ -21,6 +38,7 @@ export const listBookings = async (req, res) => {
             _id: booking._id,
             checkIn: booking.checkIn,
             checkOut: booking.checkOut,
+            roomType: booking.roomType || "Private room",
             isMine: req.user
                 ? booking.guest.equals(req.user._id)
                 : false,
@@ -42,28 +60,40 @@ export const createBooking = async (req, res) => {
         return res.status(404).json({ message: "Listing not found!" });
     }
 
-    const { checkIn, checkOut } = result.data.booking;
-    const conflictingBooking = await Booking.findOne({
-        listing: listing._id,
-        status: "confirmed",
-        checkIn: { $lt: checkOut },
-        checkOut: { $gt: checkIn },
-    });
-
-    if (conflictingBooking) {
-        return res.status(409).json({
-            message: "These dates are already booked. Please choose different dates.",
-        });
+    const { checkIn, checkOut, roomType = listing.roomType || "Private room" } = result.data.booking;
+    const capacity = getRoomCapacity(listing, roomType);
+    if (!capacity) {
+        return res.status(400).json({ message: "That room type is not available." });
     }
 
-    const booking = await Booking.create({
-        listing: listing._id,
-        guest: req.user._id,
-        checkIn,
-        checkOut,
-    });
+    return withBookingLock(`${listing._id}:${roomType}`, async () => {
+        const roomQuery = roomType === "Private room"
+            ? { $or: [{ roomType }, { roomType: { $exists: false } }] }
+            : { roomType };
+        const conflictingBookings = await Booking.countDocuments({
+            listing: listing._id,
+            ...roomQuery,
+            status: "confirmed",
+            checkIn: { $lt: checkOut },
+            checkOut: { $gt: checkIn },
+        });
 
-    res.status(201).json(booking);
+        if (conflictingBookings >= capacity) {
+            return res.status(409).json({
+                message: "All rooms of this type are booked for those dates.",
+            });
+        }
+
+        const booking = await Booking.create({
+            listing: listing._id,
+            guest: req.user._id,
+            checkIn,
+            checkOut,
+            roomType,
+        });
+
+        return res.status(201).json(booking);
+    });
 };
 
 export const deleteBooking = async (req, res) => {

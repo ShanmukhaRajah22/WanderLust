@@ -28,6 +28,23 @@ const amenitiesSchema = z.preprocess(
     z.array(z.enum(listingAmenities)).default([]),
 );
 
+const roomInventorySchema = z.preprocess(
+    (value) => {
+        if (typeof value !== "string") return value || undefined;
+        try {
+            return JSON.parse(value);
+        } catch {
+            return undefined;
+        }
+    },
+    z.array(
+        z.object({
+            roomType: z.enum(listingRoomTypes),
+            totalRooms: z.coerce.number().int().min(1),
+        }),
+    ).min(1).optional(),
+);
+
 export const listingSchema = z.object({
     listing: z.object({
         title: z.string().min(1, "Title is required"),
@@ -36,6 +53,7 @@ export const listingSchema = z.object({
         location: z.string().min(1, "Location is required"),
         country: z.string().min(1, "Country is required"),
         roomType: z.enum(listingRoomTypes).default("Private room"),
+        roomInventory: roomInventorySchema,
         amenities: amenitiesSchema,
         image: z
             .object({
@@ -57,6 +75,7 @@ export const bookingSchema = z.object({
         .object({
             checkIn: z.coerce.date({ message: "Check-in date is required" }),
             checkOut: z.coerce.date({ message: "Check-out date is required" }),
+            roomType: z.string().optional(),
         })
         .refine(
             ({ checkIn, checkOut }) => checkOut > checkIn,

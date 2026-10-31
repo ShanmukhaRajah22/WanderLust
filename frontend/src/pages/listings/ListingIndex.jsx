@@ -66,11 +66,18 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
         api
           .getBookings(listing._id)
           .then((bookings) => {
-            const available = !bookings.some(
-              (booking) =>
-                new Date(booking.checkIn) < new Date(`${filters.checkOut}T00:00:00`) &&
-                new Date(booking.checkOut) > new Date(`${filters.checkIn}T00:00:00`),
-            );
+            const roomTypes = listing.roomInventory?.length
+              ? listing.roomInventory
+              : [{ roomType: listing.roomType || "Private room", totalRooms: 1 }];
+            const available = roomTypes.some((room) => {
+              const overlapping = bookings.filter(
+                (booking) =>
+                  booking.roomType === room.roomType &&
+                  new Date(booking.checkIn) < new Date(`${filters.checkOut}T00:00:00`) &&
+                  new Date(booking.checkOut) > new Date(`${filters.checkIn}T00:00:00`),
+              );
+              return overlapping.length < room.totalRooms;
+            });
             return available ? listing._id : null;
           })
           .catch(() => null),

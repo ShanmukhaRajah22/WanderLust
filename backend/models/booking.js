@@ -20,6 +20,11 @@ const bookingSchema = new mongoose.Schema(
             type: Date,
             required: true,
         },
+        roomType: {
+            type: String,
+            required: true,
+            default: "Private room",
+        },
         status: {
             type: String,
             enum: ["confirmed", "cancelled"],
@@ -30,6 +35,7 @@ const bookingSchema = new mongoose.Schema(
 );
 
 bookingSchema.index({ listing: 1, checkIn: 1, checkOut: 1 });
+bookingSchema.index({ listing: 1, roomType: 1, checkIn: 1, checkOut: 1 });
 bookingSchema.index({ guest: 1, checkIn: 1 });
 
 export default mongoose.model("Booking", bookingSchema);

@@ -17,6 +17,7 @@ export default function ListingNew({ onNavigate, onCreated }) {
     imageUrl: "",
     amenities: [],
     roomType: "Private room",
+    roomInventory: [{ roomType: "Private room", totalRooms: 1 }],
   });
   const [imgFile, setImgFile] = useState(null);
   const [preview, setPreview] = useState("");
@@ -57,6 +58,7 @@ export default function ListingNew({ onNavigate, onCreated }) {
     fd.append("listing[country]", form.country);
     fd.append("listing[amenities]", JSON.stringify(form.amenities));
     fd.append("listing[roomType]", form.roomType);
+    fd.append("listing[roomInventory]", JSON.stringify(form.roomInventory));
     if (imgFile) fd.append("listing[image]", imgFile);
     try {
       const data = await api.createListing(fd);
@@ -190,6 +192,53 @@ export default function ListingNew({ onNavigate, onCreated }) {
             </label>
           ))}
         </div>
+
+        <div className="lform-section" style={{ marginTop: 28 }}>Room inventory</div>
+        {form.roomInventory.map((room, index) => (
+          <div className="form-row" key={`${room.roomType}-${index}`}>
+            <select
+              className="form-input"
+              value={room.roomType}
+              onChange={(event) => setForm((current) => ({
+                ...current,
+                roomInventory: current.roomInventory.map((item, itemIndex) =>
+                  itemIndex === index ? { ...item, roomType: event.target.value } : item,
+                ),
+              }))}
+            >
+              {ROOM_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
+            </select>
+            <input
+              className="form-input"
+              type="number"
+              min="1"
+              value={room.totalRooms}
+              onChange={(event) => setForm((current) => ({
+                ...current,
+                roomInventory: current.roomInventory.map((item, itemIndex) =>
+                  itemIndex === index ? { ...item, totalRooms: event.target.value } : item,
+                ),
+              }))}
+              placeholder="Number of rooms"
+            />
+            {form.roomInventory.length > 1 && (
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setForm((current) => ({
+                ...current,
+                roomInventory: current.roomInventory.filter((_, itemIndex) => itemIndex !== index),
+              }))}>Remove</button>
+            )}
+          </div>
+        ))}
+        <button
+          type="button"
+          className="btn btn-outline btn-sm"
+          onClick={() => setForm((current) => ({
+            ...current,
+            roomInventory: [...current.roomInventory, { roomType: "Suite", totalRooms: 1 }],
+          }))}
+        >
+          + Add room type
+        </button>
 
         <div className="lform-section" style={{ marginTop: 28 }}>
           Photo

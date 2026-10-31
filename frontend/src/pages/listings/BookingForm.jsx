@@ -64,6 +64,10 @@ export default function BookingForm({ listing, onNavigate }) {
   const [cancellationMessage, setCancellationMessage] = useState("");
   const [confirmedBooking, setConfirmedBooking] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const roomOptions = listing.roomInventory?.length
+    ? listing.roomInventory
+    : [{ roomType: listing.roomType || "Private room", totalRooms: 1 }];
+  const [roomType, setRoomType] = useState(roomOptions[0].roomType);
 
   const loadBookings = useCallback(
     () =>
@@ -97,7 +101,7 @@ export default function BookingForm({ listing, onNavigate }) {
 
     setLoading(true);
     try {
-      await api.createBooking(listing._id, { booking: dates });
+      await api.createBooking(listing._id, { booking: { ...dates, roomType } });
       showFlash("Booking confirmed!");
       setSuccessMessage("Your stay is booked successfully.");
       setConfirmedBooking(dates);
@@ -138,6 +142,22 @@ export default function BookingForm({ listing, onNavigate }) {
 
       <form onSubmit={submit}>
         <DateRangePicker value={dates} onChange={setDates} />
+        {roomOptions.length > 1 && (
+          <label className="form-group">
+            <span className="form-label">Room type</span>
+            <select
+              className="form-input"
+              value={roomType}
+              onChange={(event) => setRoomType(event.target.value)}
+            >
+              {roomOptions.map((room) => (
+                <option key={room.roomType} value={room.roomType}>
+                  {room.roomType} ({room.totalRooms} rooms)
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
 
         {nights > 0 && (
           <div className="booking-card__summary">
@@ -170,6 +190,7 @@ export default function BookingForm({ listing, onNavigate }) {
               <span>
                 {new Date(booking.checkIn).toLocaleDateString()} –{" "}
                 {new Date(booking.checkOut).toLocaleDateString()}
+                {booking.roomType ? ` · ${booking.roomType}` : ""}
               </span>
               {booking.isMine && (
                 <button

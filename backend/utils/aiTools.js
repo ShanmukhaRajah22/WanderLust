@@ -84,13 +84,14 @@ export const createAvailabilityTool = (saveResult) =>
                     .string()
                     .optional()
                     .describe("The exact listing title to check"),
+                roomType: z.string().optional().describe("The room type to check"),
                 checkIn: z.string().describe("The requested check-in date in YYYY-MM-DD format"),
                 checkOut: z.string().describe("The requested check-out date in YYYY-MM-DD format"),
             })
             .refine(({ listingId, listingTitle }) => listingId || listingTitle, {
                 message: "A listing ID or title is required",
             }),
-        execute: async ({ listingId, listingTitle, checkIn, checkOut }) => {
+        execute: async ({ listingId, listingTitle, roomType: requestedRoomType, checkIn, checkOut }) => {
             const checkInDate = new Date(`${checkIn}T00:00:00.000Z`);
             const checkOutDate = new Date(`${checkOut}T00:00:00.000Z`);
 
@@ -108,16 +109,19 @@ export const createAvailabilityTool = (saveResult) =>
             }
 
             const listing = listingId && mongoose.isValidObjectId(listingId)
-                ? await Listing.findById(listingId).select("title")
-                : await Listing.findOne({ title: listingTitle }).select("title");
+                ? await Listing.findById(listingId).select("title roomType roomInventory")
+                : await Listing.findOne({ title: listingTitle }).select("title roomType roomInventory");
             if (!listing) {
                 const result = { available: false, message: "Listing not found." };
                 saveResult(result);
                 return result;
             }
 
-            const conflict = await Booking.findOne({
+            const roomType = requestedRoomType || listing.roomType || "Private room";
+            const capacity = listing.roomInventory?.find((room) => room.roomType === roomType)?.totalRooms || 1;
+            const conflictCount = await Booking.countDocuments({
                 listing: listing._id,
+                roomType,
                 status: "confirmed",
                 checkIn: { $lt: checkOutDate },
                 checkOut: { $gt: checkInDate },
@@ -126,9 +130,9 @@ export const createAvailabilityTool = (saveResult) =>
             const result = {
                 listingId: listing._id.toString(),
                 title: listing.title,
-                available: !conflict,
-                message: conflict
-                    ? "Those dates are already booked."
+                available: conflictCount < capacity,
+                message: conflictCount >= capacity
+                    ? "Those dates are fully booked."
                     : "Those dates are available.",
             };
             saveResult(result);

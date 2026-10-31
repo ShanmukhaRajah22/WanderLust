@@ -36,6 +36,23 @@ const listingSchema = new Schema({
         enum: listingRoomTypes,
         default: "Private room",
     },
+    roomInventory: {
+        type: [
+            {
+                roomType: {
+                    type: String,
+                    enum: listingRoomTypes,
+                    required: true,
+                },
+                totalRooms: {
+                    type: Number,
+                    min: 1,
+                    default: 1,
+                },
+            },
+        ],
+        default: undefined,
+    },
     amenities: {
         type: [String],
         enum: listingAmenities,
