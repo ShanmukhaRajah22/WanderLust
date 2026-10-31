@@ -13,6 +13,11 @@ export const listingAmenities = [
     "Hot tub",
     "Breakfast",
     "Washer",
+    "Balcony",
+    "Garden",
+    "Beach access",
+    "Fireplace",
+    "Gym",
 ];
 export const listingRoomTypes = ["Private room", "Entire home", "Suite", "Deluxe room", "Shared room"];
 

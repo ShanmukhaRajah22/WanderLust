@@ -28,8 +28,8 @@ search powered by OpenRouter's `openrouter/free` model.
 - Upload images with Cloudinary and Multer
 - Geocode a listing's city and country through the OpenStreetMap provider
 - Store coordinates as GeoJSON
-- Define amenities such as WiFi, pool, kitchen, workspace, and pet-friendly
-  access
+- Define 15 amenities such as WiFi, pool, kitchen, workspace, balcony, garden,
+  gym, and pet-friendly access
 - Define room types such as private room, entire home, suite, deluxe room, and
   shared room
 - Configure inventory for multiple room types, for example five suites and
@@ -230,8 +230,8 @@ files or frontend environment variables.
 
 ## Seed data
 
-The seed script recreates 25 sample listings and assigns starter amenities,
-room types, and room inventory:
+The seed script recreates 25 sample listings and assigns at least five
+amenities, four room types, and room inventory to each listing:
 
 ```bash
 npm run seed

@@ -224,7 +224,7 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
               }}
             >
               <option value="">Any amenity</option>
-              {["WiFi", "Pool", "Kitchen", "Air conditioning", "Free parking", "Pet friendly", "Workspace", "Hot tub", "Breakfast", "Washer"].map((amenity) => (
+              {["WiFi", "Pool", "Kitchen", "Air conditioning", "Free parking", "Pet friendly", "Workspace", "Hot tub", "Breakfast", "Washer", "Balcony", "Garden", "Beach access", "Fireplace", "Gym"].map((amenity) => (
                 <option key={amenity} value={amenity}>{amenity}</option>
               ))}
             </select>

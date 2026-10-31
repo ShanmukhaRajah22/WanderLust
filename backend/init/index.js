@@ -10,10 +10,10 @@ const dbUrl = process.env.ATLASDB_URL;
 const initDB = async () => {
     await Listing.deleteMany({});
     const amenitySets = [
-        ["WiFi", "Kitchen", "Free parking"],
-        ["WiFi", "Pool", "Air conditioning"],
-        ["WiFi", "Pet friendly", "Workspace"],
-        ["WiFi", "Breakfast", "Hot tub"],
+        ["WiFi", "Kitchen", "Free parking", "Balcony", "Garden"],
+        ["WiFi", "Pool", "Air conditioning", "Gym", "Fireplace"],
+        ["WiFi", "Pet friendly", "Workspace", "Beach access", "Washer"],
+        ["WiFi", "Breakfast", "Hot tub", "Balcony", "Free parking"],
     ];
     const roomInventory = [
         { roomType: "Private room", totalRooms: 10 },

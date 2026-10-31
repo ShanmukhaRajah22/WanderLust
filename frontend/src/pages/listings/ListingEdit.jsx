@@ -4,7 +4,7 @@ import { api } from "../../utils/api";
 import PageLoader from "../../components/ui/page-loader";
 import "./ListingForm.css";
 
-const AMENITIES = ["WiFi", "Pool", "Kitchen", "Air conditioning", "Free parking", "Pet friendly", "Workspace", "Hot tub", "Breakfast", "Washer"];
+const AMENITIES = ["WiFi", "Pool", "Kitchen", "Air conditioning", "Free parking", "Pet friendly", "Workspace", "Hot tub", "Breakfast", "Washer", "Balcony", "Garden", "Beach access", "Fireplace", "Gym"];
 const ROOM_TYPES = ["Private room", "Entire home", "Suite", "Deluxe room", "Shared room"];
 
 export default function ListingEdit({ listingId, onNavigate }) {
