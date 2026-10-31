@@ -15,10 +15,14 @@ router and free OpenStreetMap geocoding.
 - Browse all available stays
 - Search by title, location, country, or keyword
 - Filter by country, maximum price, map availability, and dates
+- Filter by amenities and room type
+- Paginate results with 12 listings per page
+- Sort by price, title, or newest listing
 - Create, edit, and delete listings
 - Upload listing images through Cloudinary
 - View each listing's location on an OpenStreetMap map
 - Store listing coordinates as GeoJSON
+- Add multiple room types and room counts to one listing
 
 ### Accounts and permissions
 
@@ -38,8 +42,10 @@ router and free OpenStreetMap geocoding.
 ### Bookings
 
 - Select check-in and check-out dates with a calendar range picker
+- Choose a room type when a listing has multiple room types
 - Calculate nights and total price before booking
-- Prevent overlapping reservations on the server
+- Allow overlapping reservations while rooms remain available
+- Reject a booking when all rooms of the selected type are occupied
 - Store confirmed booking dates in MongoDB
 - View booked date ranges on listing pages
 - View all personal reservations on My Bookings
@@ -112,8 +118,8 @@ Nestly/
 │   │   ├── reviews.js            # Review operations
 │   │   └── users.js              # Authentication and profile operations
 │   ├── models/
-│   │   ├── booking.js            # Persistent reservation dates
-│   │   ├── listing.js            # Listing and GeoJSON coordinates
+│   │   ├── booking.js            # Reservation dates and room type
+│   │   ├── listing.js            # Listing, amenities, rooms, and coordinates
 │   │   ├── review.js             # Listing reviews
 │   │   └── user.js               # User accounts
 │   ├── routes/
@@ -321,8 +327,21 @@ existing.checkIn < requested.checkOut
 AND existing.checkOut > requested.checkIn
 ```
 
-Back-to-back reservations are allowed. Booking dates are stored persistently
-in MongoDB and are not kept only in frontend state.
+Back-to-back reservations are allowed. Booking dates and the selected room type are stored persistently in MongoDB and
+are not kept only in frontend state. A listing can define inventory such as:
+
+```js
+roomInventory: [
+  { roomType: "Suite", totalRooms: 5 },
+  { roomType: "Deluxe room", totalRooms: 10 }
+]
+```
+
+Two guests can reserve the same dates when different rooms of the selected
+type are still available. The server counts overlapping confirmed bookings for
+that room type before saving a new booking. A small in-process booking lock
+serializes simultaneous requests for the same listing and room type, so two
+requests handled by the same server cannot both consume the final room.
 
 ### AI assistant
 
@@ -368,6 +387,8 @@ message, and restricted to the application's listing and availability tools.
 - Authentication and ownership middleware protect private operations.
 - Sessions are stored in MongoDB through `connect-mongo`.
 - AI requests are rate-limited per IP in memory.
+- Login and signup requests are limited to 10 requests per 15 minutes per IP.
+- Booking creation is limited to 30 requests per 15 minutes per IP.
 - Secrets remain backend-only.
 - User-provided listing data is not converted into arbitrary MongoDB queries.
 - Booking overlap checks run on the server before a reservation is saved.
@@ -393,6 +414,10 @@ cd frontend
 npm run lint
 npm run build
 ```
+
+The seed command assigns amenities, room types, and starter room inventory to
+all 25 sample listings. Run it again if an existing database was seeded before
+these fields were added. It clears and recreates the sample listings.
 
 ## Deployment notes
 
