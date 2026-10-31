@@ -87,19 +87,22 @@
 /* Info grid */
 .show-page__info-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
   margin-bottom: 20px;
+  align-items: stretch;
 }
 .show-page__info-card {
   background: var(--white);
   border: 1px solid var(--dust);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
-}
-.show-page__info-card--location {
-  width: 50%;
-  min-width: 180px;
+  min-height: 120px;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 .show-page__info-label {
   font-size: 11px;
@@ -113,6 +116,7 @@
   font-size: 15px;
   font-weight: 500;
   color: var(--ink);
+  overflow-wrap: anywhere;
 }
 
 /* Description */
@@ -164,14 +168,26 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 .show-page__amenity-list span {
-  padding: 7px 10px;
+  padding: 5px 8px;
   border-radius: 999px;
   background: var(--dust-light);
   color: var(--ink-light);
   font-size: 12px;
+}
+
+@media (max-width: 800px) {
+  .show-page__info-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .show-page__info-grid {
+    grid-template-columns: 1fr;
+  }
 }
 .booking-card__heading strong {
   color: var(--rust);

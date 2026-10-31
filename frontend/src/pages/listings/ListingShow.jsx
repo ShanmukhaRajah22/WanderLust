@@ -233,12 +233,12 @@ export default function ListingShow({ listingId, onNavigate }) {
 
       {/* Info grid */}
       <div className="show-page__info-grid">
-        <div className="show-page__info-card show-page__info-card--location">
+        <div className="show-page__info-card">
           <div className="show-page__info-label">Location</div>
           <div className="show-page__info-val">📍 {listing.location}</div>
         </div>
         {listing.amenities?.length > 0 && (
-          <div className="show-page__amenities">
+          <div className="show-page__info-card">
             <div className="show-page__info-label">Amenities</div>
             <div className="show-page__amenity-list">
               {listing.amenities.map((amenity) => <span key={amenity}>{amenity}</span>)}
