@@ -21,8 +21,54 @@ const geocodeListing = async (listing) => {
 
 // GET /listings
 export const index = async (req, res) => {
-    const allListings = await Listing.find({});
-    res.json(allListings);
+    const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
+    const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 12, 1), 24);
+    const query = {};
+    const search = String(req.query.search || "").trim();
+    const location = String(req.query.location || "").trim();
+    const country = String(req.query.country || "").trim();
+    const amenity = String(req.query.amenity || "").trim();
+    const roomType = String(req.query.roomType || "").trim();
+
+    if (search) {
+        const expression = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+        query.$or = [{ title: expression }, { description: expression }, { location: expression }, { country: expression }];
+    }
+    if (location) query.location = new RegExp(location, "i");
+    if (country) query.country = country;
+    if (amenity) query.amenities = amenity;
+    if (roomType) query.roomType = roomType;
+    if (req.query.mapOnly === "true") {
+        query["geometry.coordinates.1"] = { $exists: true };
+    }
+    if (req.query.maxPrice) {
+        query.price = { $lte: Number(req.query.maxPrice) };
+    }
+
+    const sortOptions = {
+        priceAsc: { price: 1, _id: 1 },
+        priceDesc: { price: -1, _id: 1 },
+        title: { title: 1, _id: 1 },
+        newest: { _id: -1 },
+    };
+    const sort = sortOptions[req.query.sort] || sortOptions.priceAsc;
+    const [listings, total] = await Promise.all([
+        Listing.find(query)
+            .sort(sort)
+            .skip((page - 1) * limit)
+            .limit(limit),
+        Listing.countDocuments(query),
+    ]);
+
+    res.json({
+        listings,
+        pagination: {
+            page,
+            limit,
+            total,
+            pages: Math.ceil(total / limit),
+        },
+    });
 };
 
 // GET /listings/new  (kept for legacy, React doesn't use this)

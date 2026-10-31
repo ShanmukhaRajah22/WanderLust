@@ -123,6 +123,13 @@
   padding: 0 0 72px;
   scroll-margin-top: 24px;
 }
+.idx-pagination {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 32px;
+}
 
 .idx-listings__header {
   display: flex;

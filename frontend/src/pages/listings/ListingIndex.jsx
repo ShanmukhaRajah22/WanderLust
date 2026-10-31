@@ -12,6 +12,9 @@ import "../../context/ColdStartBanner.css";
 export default function ListingIndex({ onNavigate, onSelectListing }) {
   const { currentUser } = useApp();
   const [listings, setListings] = useState([]);
+  const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
+  const [sort, setSort] = useState("priceAsc");
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState({
@@ -32,11 +35,25 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
   }, []);
   useEffect(() => {
     api
-      .getListings()
-      .then((data) => setListings(data))
+      .getListings({
+        page,
+        limit: 12,
+        search,
+        location: filters.location,
+        country: filters.country,
+        maxPrice: filters.maxPrice,
+        amenity: filters.amenity,
+        roomType: filters.roomType,
+        mapOnly: filters.mapOnly ? "true" : "",
+        sort,
+      })
+      .then((data) => {
+        setListings(data.listings || []);
+        setPagination(data.pagination || { page: 1, pages: 1, total: 0 });
+      })
       .catch(() => setListings([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [page, search, filters.location, filters.country, filters.maxPrice, filters.amenity, filters.roomType, filters.mapOnly, sort]);
 
   useEffect(() => {
     if (!filters.checkIn || !filters.checkOut || filters.checkOut <= filters.checkIn) {
@@ -109,10 +126,13 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
     if (name === "checkIn" || name === "checkOut") {
       setAvailableIds(null);
     }
+    setPage(1);
     setFilters((current) => ({ ...current, [name]: event.target.value }));
   };
   const clearFilters = () => {
     setSearch("");
+    setPage(1);
+    setSort("priceAsc");
     setFilters({
       country: "",
       location: "",
@@ -148,19 +168,38 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
               className="idx-hero__search-input"
               placeholder="Search by city, country or name…"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
               onKeyDown={submitTextFilter}
             />
             {search && (
               <button
                 className="idx-hero__search-clear"
-                onClick={() => setSearch("")}
+                onClick={() => {
+                  setSearch("");
+                  setPage(1);
+                }}
               >
                 ×
               </button>
             )}
           </div>
           <div className="idx-filters">
+            <select
+              value={sort}
+              onChange={(event) => {
+                setSort(event.target.value);
+                setPage(1);
+                scrollToListings();
+              }}
+            >
+              <option value="priceAsc">Price: low to high</option>
+              <option value="priceDesc">Price: high to low</option>
+              <option value="newest">Newest first</option>
+              <option value="title">Title: A to Z</option>
+            </select>
             <input
               placeholder="Location"
               value={filters.location}
@@ -265,7 +304,7 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
             <span className="idx-listings__count">
               {loading
                 ? "Loading…"
-                : `${filtered.length} place${filtered.length !== 1 ? "s" : ""}`}
+                : `${pagination.total} place${pagination.total !== 1 ? "s" : ""}`}
             </span>
           </div>
           {(search || filters.location || filters.country || filters.maxPrice) && (
@@ -309,6 +348,42 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
                 </button>
               )}
             </div>
+          )}
+          {!loading && pagination.pages > 1 && (
+            <nav className="idx-pagination" aria-label="Listing pages">
+              <button
+                className="btn btn-outline btn-sm"
+                disabled={page === 1}
+                onClick={() => {
+                  setPage((current) => current - 1);
+                  scrollToListings();
+                }}
+              >
+                Previous
+              </button>
+              {Array.from({ length: pagination.pages }, (_, index) => index + 1).map((number) => (
+                <button
+                  key={number}
+                  className={`btn btn-sm ${number === page ? "btn-dark" : "btn-outline"}`}
+                  onClick={() => {
+                    setPage(number);
+                    scrollToListings();
+                  }}
+                >
+                  {number}
+                </button>
+              ))}
+              <button
+                className="btn btn-outline btn-sm"
+                disabled={page === pagination.pages}
+                onClick={() => {
+                  setPage((current) => current + 1);
+                  scrollToListings();
+                }}
+              >
+                Next
+              </button>
+            </nav>
           )}
         </div>
       </section>

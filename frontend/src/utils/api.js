@@ -25,7 +25,12 @@ export const api = {
   getProfile: () => req("/users/me"),
 
   // Listings
-  getListings: () => req("/listings"),
+  getListings: (params = {}) => {
+    const query = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== "" && value !== undefined),
+    ).toString();
+    return req(`/listings${query ? `?${query}` : ""}`);
+  },
   getListing: (id) => req(`/listings/${id}`),
   createListing: (fd) => fetch(`${BASE}/listings`, { method: "POST", credentials: "include", body: fd }).then(async r => { if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.message || `HTTP ${r.status}`); } return r.json(); }),
   updateListing: (id, fd) => fetch(`${BASE}/listings/${id}?_method=PUT`, { method: "POST", credentials: "include", body: fd }).then(async r => { if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.message || `HTTP ${r.status}`); } return r.json(); }),
