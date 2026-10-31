@@ -89,13 +89,13 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
-  margin-bottom: 28px;
+  margin-bottom: 20px;
 }
 .show-page__info-card {
   background: var(--white);
   border: 1px solid var(--dust);
   border-radius: var(--radius-sm);
-  padding: 16px 18px;
+  padding: 10px 14px;
 }
 .show-page__info-label {
   font-size: 11px;
