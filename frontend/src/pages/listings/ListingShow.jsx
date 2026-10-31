@@ -233,7 +233,7 @@ export default function ListingShow({ listingId, onNavigate }) {
 
       {/* Info grid */}
       <div className="show-page__info-grid">
-        <div className="show-page__info-card">
+        <div className="show-page__info-card show-page__info-card--location">
           <div className="show-page__info-label">Location</div>
           <div className="show-page__info-val">📍 {listing.location}</div>
         </div>

@@ -97,6 +97,10 @@
   border-radius: var(--radius-sm);
   padding: 10px 14px;
 }
+.show-page__info-card--location {
+  width: 50%;
+  min-width: 180px;
+}
 .show-page__info-label {
   font-size: 11px;
   font-weight: 700;
@@ -527,6 +531,9 @@
   }
   .show-page__info-grid {
     grid-template-columns: 1fr;
+  }
+  .show-page__info-card--location {
+    width: 50%;
   }
   .show-page__img,
   .show-page__img-placeholder {
