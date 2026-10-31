@@ -49,7 +49,15 @@ export const createListingSearchTool = (saveResults) =>
                 query.amenities = { $all: amenities };
             }
             if (roomType) {
-                query.roomType = textSearch(roomType);
+                query.$and = [
+                    ...(query.$and || []),
+                    {
+                        $or: [
+                            { roomType: textSearch(roomType) },
+                            { "roomInventory.roomType": textSearch(roomType) },
+                        ],
+                    },
+                ];
             }
 
             const listings = await Listing.find(query)

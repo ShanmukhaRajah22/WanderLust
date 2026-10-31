@@ -32,12 +32,19 @@ export const index = async (req, res) => {
 
     if (search) {
         const expression = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
-        query.$or = [{ title: expression }, { description: expression }, { location: expression }, { country: expression }];
+        query.$and = [{
+            $or: [{ title: expression }, { description: expression }, { location: expression }, { country: expression }],
+        }];
     }
     if (location) query.location = new RegExp(location, "i");
     if (country) query.country = country;
     if (amenity) query.amenities = amenity;
-    if (roomType) query.roomType = roomType;
+    if (roomType) {
+        query.$and = [
+            ...(query.$and || []),
+            { $or: [{ roomType }, { "roomInventory.roomType": roomType }] },
+        ];
+    }
     if (req.query.mapOnly === "true") {
         query["geometry.coordinates.1"] = { $exists: true };
     }

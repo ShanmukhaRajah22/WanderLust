@@ -123,7 +123,9 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
     (!filters.location || l.location.toLowerCase().includes(filters.location.toLowerCase())) &&
     (!filters.maxPrice || Number(l.price) <= Number(filters.maxPrice)) &&
     (!filters.amenity || l.amenities?.includes(filters.amenity)) &&
-    (!filters.roomType || (l.roomType || "Private room") === filters.roomType) &&
+    (!filters.roomType ||
+      (l.roomType || "Private room") === filters.roomType ||
+      l.roomInventory?.some((room) => room.roomType === filters.roomType)) &&
     (!filters.mapOnly || l.geometry?.coordinates?.length === 2) &&
     (!datesAreValid || !availableIds || availableIds.has(l._id)),
   );

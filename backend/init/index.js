@@ -15,9 +15,16 @@ const initDB = async () => {
         ["WiFi", "Pet friendly", "Workspace"],
         ["WiFi", "Breakfast", "Hot tub"],
     ];
+    const roomInventory = [
+        { roomType: "Private room", totalRooms: 10 },
+        { roomType: "Entire home", totalRooms: 10 },
+        { roomType: "Suite", totalRooms: 10 },
+        { roomType: "Deluxe room", totalRooms: 10 },
+    ];
     const listings = data.map((obj, index) => ({
         ...obj,
-        roomType: ["Private room", "Entire home", "Suite", "Deluxe room", "Shared room"][index % 5],
+        roomType: "Private room",
+        roomInventory,
         amenities: amenitySets[index % amenitySets.length],
         owner: "6993006094eb8ec198c65fd7",
     }));
