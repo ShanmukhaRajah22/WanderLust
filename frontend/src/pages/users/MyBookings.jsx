@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useApp } from "../../context/AppContext";
 import { api } from "../../utils/api";
 import PageLoader from "../../components/ui/page-loader";
@@ -6,12 +7,32 @@ import "./MyBookings.css";
 
 const date = (value) => new Date(value).toLocaleDateString("en-IN");
 
+function CancellationDialog({ booking, onClose }) {
+  return (
+    <div className="my-bookings__dialog" role="dialog" aria-modal="true">
+      <div className="my-bookings__dialog-card">
+        <div className="my-bookings__dialog-icon">✓</div>
+        <p className="my-bookings__eyebrow">Reservation cancelled</p>
+        <h2>Booking removed</h2>
+        <p>
+          Your reservation at{" "}
+          <strong>{booking.listing?.title || "this stay"}</strong> was
+          cancelled successfully.
+        </p>
+        <button className="btn btn-dark" onClick={onClose}>
+          Continue exploring
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function MyBookings({ onNavigate }) {
   const { showFlash } = useApp();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(null);
-  const [cancellationMessage, setCancellationMessage] = useState("");
+  const [cancelledBooking, setCancelledBooking] = useState(null);
 
   const loadBookings = () => {
     api
@@ -32,9 +53,8 @@ export default function MyBookings({ onNavigate }) {
       setBookings((current) =>
         current.filter((item) => item._id !== booking._id),
       );
-      const message = "Your booking was cancelled and removed.";
-      showFlash(message);
-      setCancellationMessage(message);
+      showFlash("Your booking was cancelled and removed.");
+      setCancelledBooking(booking);
     } catch (error) {
       showFlash(error.message || "Could not cancel booking.", "error");
     } finally {
@@ -59,12 +79,6 @@ export default function MyBookings({ onNavigate }) {
       <p className="my-bookings__intro">
         Keep track of your confirmed stays in one place.
       </p>
-      {cancellationMessage && (
-        <p className="my-bookings__success" role="status">
-          {cancellationMessage}
-        </p>
-      )}
-
       {bookings.length === 0 ? (
         <div className="empty-state">
           <div className="empty-state__icon">&#127968;</div>
@@ -110,6 +124,14 @@ export default function MyBookings({ onNavigate }) {
           ))}
         </div>
       )}
+      {cancelledBooking &&
+        createPortal(
+          <CancellationDialog
+            booking={cancelledBooking}
+            onClose={() => setCancelledBooking(null)}
+          />,
+          document.body,
+        )}
     </div>
   );
 }

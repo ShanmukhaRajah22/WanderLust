@@ -27,12 +27,6 @@
   font-size: 15px;
 }
 
-.my-bookings__success {
-  margin: -14px 0 24px;
-  color: var(--success);
-  font-weight: 600;
-}
-
 .my-bookings__list {
   display: grid;
   gap: 16px;
@@ -117,6 +111,54 @@
 
 .my-booking__cancel {
   flex-shrink: 0;
+}
+
+.my-bookings__dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(26, 22, 18, 0.68);
+  backdrop-filter: blur(5px);
+}
+
+.my-bookings__dialog-card {
+  width: min(100%, 440px);
+  padding: 38px 32px;
+  border: 1px solid var(--dust);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  box-shadow: 0 24px 70px rgba(26, 22, 18, 0.28);
+  text-align: center;
+}
+
+.my-bookings__dialog-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 12px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--success-light);
+  color: var(--success);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.my-bookings__dialog-card h2 {
+  margin: 8px 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 30px;
+}
+
+.my-bookings__dialog-card p {
+  margin-bottom: 24px;
+  color: var(--ink-light);
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 @media (max-width: 650px) {
