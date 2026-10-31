@@ -18,6 +18,7 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
     country: "",
     location: "",
     maxPrice: "",
+    amenity: "",
     mapOnly: false,
     checkIn: "",
     checkOut: "",
@@ -96,6 +97,7 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
     (!filters.country || l.country === filters.country) &&
     (!filters.location || l.location.toLowerCase().includes(filters.location.toLowerCase())) &&
     (!filters.maxPrice || Number(l.price) <= Number(filters.maxPrice)) &&
+    (!filters.amenity || l.amenities?.includes(filters.amenity)) &&
     (!filters.mapOnly || l.geometry?.coordinates?.length === 2) &&
     (!datesAreValid || !availableIds || availableIds.has(l._id)),
   );
@@ -113,6 +115,7 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
       country: "",
       location: "",
       maxPrice: "",
+      amenity: "",
       mapOnly: false,
       checkIn: "",
       checkOut: "",
@@ -162,6 +165,18 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
               onKeyDown={submitTextFilter}
               onBlur={scrollToListings}
             />
+            <select
+              value={filters.amenity}
+              onChange={(event) => {
+                setFilter("amenity")(event);
+                scrollToListings();
+              }}
+            >
+              <option value="">Any amenity</option>
+              {["WiFi", "Pool", "Kitchen", "Air conditioning", "Free parking", "Pet friendly", "Workspace", "Hot tub", "Breakfast", "Washer"].map((amenity) => (
+                <option key={amenity} value={amenity}>{amenity}</option>
+              ))}
+            </select>
             <select
               value={filters.country}
               onChange={(event) => {

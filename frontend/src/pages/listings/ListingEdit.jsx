@@ -4,6 +4,8 @@ import { api } from "../../utils/api";
 import PageLoader from "../../components/ui/page-loader";
 import "./ListingForm.css";
 
+const AMENITIES = ["WiFi", "Pool", "Kitchen", "Air conditioning", "Free parking", "Pet friendly", "Workspace", "Hot tub", "Breakfast", "Washer"];
+
 export default function ListingEdit({ listingId, onNavigate }) {
   const { showFlash } = useApp();
   const [form, setForm] = useState(null);
@@ -24,6 +26,7 @@ export default function ListingEdit({ listingId, onNavigate }) {
           location: l.location || "",
           country: l.country || "",
           imageUrl: l.image?.url || "",
+          amenities: l.amenities || [],
         });
         setFetching(false);
       })
@@ -67,6 +70,7 @@ export default function ListingEdit({ listingId, onNavigate }) {
     fd.append("listing[price]", form.price);
     fd.append("listing[location]", form.location);
     fd.append("listing[country]", form.country);
+    fd.append("listing[amenities]", JSON.stringify(form.amenities));
     if (imgFile) fd.append("listing[image]", imgFile);
     try {
       await api.updateListing(listingId, fd);
@@ -106,6 +110,27 @@ export default function ListingEdit({ listingId, onNavigate }) {
             onChange={set("title")}
           />
           {errors.title && <p className="form-error">{errors.title}</p>}
+        </div>
+
+        <div className="lform-section" style={{ marginTop: 28 }}>Amenities</div>
+        <div className="lform-amenities">
+          {AMENITIES.map((amenity) => (
+            <label key={amenity}>
+              <input
+                type="checkbox"
+                checked={form.amenities.includes(amenity)}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    amenities: event.target.checked
+                      ? [...current.amenities, amenity]
+                      : current.amenities.filter((item) => item !== amenity),
+                  }))
+                }
+              />
+              {amenity}
+            </label>
+          ))}
         </div>
 
         <div className="form-group">

@@ -67,6 +67,19 @@
   color: var(--ink-light);
   margin-bottom: 12px;
 }
+.lcard__amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+.lcard__amenities span {
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: var(--dust-light);
+  color: var(--ink-light);
+  font-size: 10px;
+}
 .lcard__footer {
   display: flex;
   align-items: baseline;

@@ -10,6 +10,7 @@ const searchInput = z.object({
     keyword: z.string().optional().describe("Word to search in the title or description"),
     maxPrice: z.number().optional().describe("Maximum price per night"),
     minPrice: z.number().optional().describe("Minimum price per night"),
+    amenities: z.array(z.string()).optional().describe("Amenities the listing should have"),
 });
 
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -23,7 +24,7 @@ export const createListingSearchTool = (saveResults) =>
     tool({
         description: "Find real Nestly listings using location, country, keyword, and price filters.",
         inputSchema: searchInput,
-        execute: async ({ location, country, keyword, minPrice, maxPrice }) => {
+        execute: async ({ location, country, keyword, minPrice, maxPrice, amenities }) => {
             const query = {};
 
             if (location) {
@@ -43,9 +44,12 @@ export const createListingSearchTool = (saveResults) =>
                 if (minPrice !== undefined) query.price.$gte = minPrice;
                 if (maxPrice !== undefined) query.price.$lte = maxPrice;
             }
+            if (amenities?.length) {
+                query.amenities = { $all: amenities };
+            }
 
             const listings = await Listing.find(query)
-                .select("_id title location country price image")
+                .select("_id title location country price image amenities")
                 .sort({ price: 1, _id: 1 })
                 .limit(12)
                 .lean();
@@ -53,12 +57,13 @@ export const createListingSearchTool = (saveResults) =>
             saveResults(listings);
             return {
                 count: listings.length,
-                listings: listings.map(({ _id, title, location, country, price }) => ({
+                listings: listings.map(({ _id, title, location, country, price, amenities }) => ({
                     id: _id.toString(),
                     title,
                     location,
                     country,
                     price,
+                    amenities,
                 })),
             };
         },

@@ -149,6 +149,26 @@
   color: var(--ink-light);
   font-size: 13px;
 }
+.show-page__amenities {
+  margin: 24px 0;
+  padding: 18px 22px;
+  border: 1px solid var(--dust);
+  border-radius: var(--radius);
+  background: var(--white);
+}
+.show-page__amenity-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.show-page__amenity-list span {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: var(--dust-light);
+  color: var(--ink-light);
+  font-size: 12px;
+}
 .booking-card__heading strong {
   color: var(--rust);
   white-space: nowrap;

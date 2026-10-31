@@ -9,7 +9,17 @@ const dbUrl = process.env.ATLASDB_URL;
 
 const initDB = async () => {
     await Listing.deleteMany({});
-    const listings = data.map((obj) => ({ ...obj, owner: "6993006094eb8ec198c65fd7" }));
+    const amenitySets = [
+        ["WiFi", "Kitchen", "Free parking"],
+        ["WiFi", "Pool", "Air conditioning"],
+        ["WiFi", "Pet friendly", "Workspace"],
+        ["WiFi", "Breakfast", "Hot tub"],
+    ];
+    const listings = data.map((obj, index) => ({
+        ...obj,
+        amenities: amenitySets[index % amenitySets.length],
+        owner: "6993006094eb8ec198c65fd7",
+    }));
     await Listing.insertMany(listings);
     console.log("data was initialized");
 };

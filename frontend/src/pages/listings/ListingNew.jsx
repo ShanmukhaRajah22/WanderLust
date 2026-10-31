@@ -3,6 +3,8 @@ import { useApp } from "../../context/AppContext";
 import { api } from "../../utils/api";
 import "./ListingForm.css";
 
+const AMENITIES = ["WiFi", "Pool", "Kitchen", "Air conditioning", "Free parking", "Pet friendly", "Workspace", "Hot tub", "Breakfast", "Washer"];
+
 export default function ListingNew({ onNavigate, onCreated }) {
   const { showFlash } = useApp();
   const [form, setForm] = useState({
@@ -12,6 +14,7 @@ export default function ListingNew({ onNavigate, onCreated }) {
     location: "",
     country: "",
     imageUrl: "",
+    amenities: [],
   });
   const [imgFile, setImgFile] = useState(null);
   const [preview, setPreview] = useState("");
@@ -50,6 +53,7 @@ export default function ListingNew({ onNavigate, onCreated }) {
     fd.append("listing[price]", form.price);
     fd.append("listing[location]", form.location);
     fd.append("listing[country]", form.country);
+    fd.append("listing[amenities]", JSON.stringify(form.amenities));
     if (imgFile) fd.append("listing[image]", imgFile);
     try {
       const data = await api.createListing(fd);
@@ -139,6 +143,27 @@ export default function ListingNew({ onNavigate, onCreated }) {
               onChange={set("location")}
             />
             {errors.location && <p className="form-error">{errors.location}</p>}
+          </div>
+
+          <div className="lform-section" style={{ marginTop: 28 }}>Amenities</div>
+          <div className="lform-amenities">
+            {AMENITIES.map((amenity) => (
+              <label key={amenity}>
+                <input
+                  type="checkbox"
+                  checked={form.amenities.includes(amenity)}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      amenities: event.target.checked
+                        ? [...current.amenities, amenity]
+                        : current.amenities.filter((item) => item !== amenity),
+                    }))
+                  }
+                />
+                {amenity}
+              </label>
+            ))}
           </div>
           <div className="form-group">
             <label className="form-label" htmlFor="ln-country">

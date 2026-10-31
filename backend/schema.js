@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { listingAmenities } from "./models/listing.js";
 
 const priceSchema = z.preprocess(
     (value) => (value === "" ? undefined : Number(value)),
@@ -15,6 +16,18 @@ const ratingSchema = z.preprocess(
         .max(5, "Rating must be at most 5"),
 );
 
+const amenitiesSchema = z.preprocess(
+    (value) => {
+        if (typeof value !== "string") return value || [];
+        try {
+            return JSON.parse(value);
+        } catch {
+            return value.split(",").map((item) => item.trim()).filter(Boolean);
+        }
+    },
+    z.array(z.enum(listingAmenities)).default([]),
+);
+
 export const listingSchema = z.object({
     listing: z.object({
         title: z.string().min(1, "Title is required"),
@@ -22,6 +35,7 @@ export const listingSchema = z.object({
         price: priceSchema,
         location: z.string().min(1, "Location is required"),
         country: z.string().min(1, "Country is required"),
+        amenities: amenitiesSchema,
         image: z
             .object({
                 url: z.string().optional(),
