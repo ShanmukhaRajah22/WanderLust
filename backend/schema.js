@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { listingAmenities } from "./models/listing.js";
+import { listingAmenities, listingRoomTypes } from "./models/listing.js";
 
 const priceSchema = z.preprocess(
     (value) => (value === "" ? undefined : Number(value)),
@@ -35,6 +35,7 @@ export const listingSchema = z.object({
         price: priceSchema,
         location: z.string().min(1, "Location is required"),
         country: z.string().min(1, "Country is required"),
+        roomType: z.enum(listingRoomTypes).default("Private room"),
         amenities: amenitiesSchema,
         image: z
             .object({

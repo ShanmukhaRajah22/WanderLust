@@ -4,6 +4,7 @@ import { api } from "../../utils/api";
 import "./ListingForm.css";
 
 const AMENITIES = ["WiFi", "Pool", "Kitchen", "Air conditioning", "Free parking", "Pet friendly", "Workspace", "Hot tub", "Breakfast", "Washer"];
+const ROOM_TYPES = ["Private room", "Entire home", "Suite", "Deluxe room", "Shared room"];
 
 export default function ListingNew({ onNavigate, onCreated }) {
   const { showFlash } = useApp();
@@ -15,6 +16,7 @@ export default function ListingNew({ onNavigate, onCreated }) {
     country: "",
     imageUrl: "",
     amenities: [],
+    roomType: "Private room",
   });
   const [imgFile, setImgFile] = useState(null);
   const [preview, setPreview] = useState("");
@@ -54,6 +56,7 @@ export default function ListingNew({ onNavigate, onCreated }) {
     fd.append("listing[location]", form.location);
     fd.append("listing[country]", form.country);
     fd.append("listing[amenities]", JSON.stringify(form.amenities));
+    fd.append("listing[roomType]", form.roomType);
     if (imgFile) fd.append("listing[image]", imgFile);
     try {
       const data = await api.createListing(fd);
@@ -145,26 +148,6 @@ export default function ListingNew({ onNavigate, onCreated }) {
             {errors.location && <p className="form-error">{errors.location}</p>}
           </div>
 
-          <div className="lform-section" style={{ marginTop: 28 }}>Amenities</div>
-          <div className="lform-amenities">
-            {AMENITIES.map((amenity) => (
-              <label key={amenity}>
-                <input
-                  type="checkbox"
-                  checked={form.amenities.includes(amenity)}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-                      amenities: event.target.checked
-                        ? [...current.amenities, amenity]
-                        : current.amenities.filter((item) => item !== amenity),
-                    }))
-                  }
-                />
-                {amenity}
-              </label>
-            ))}
-          </div>
           <div className="form-group">
             <label className="form-label" htmlFor="ln-country">
               Country *
@@ -178,6 +161,34 @@ export default function ListingNew({ onNavigate, onCreated }) {
             />
             {errors.country && <p className="form-error">{errors.country}</p>}
           </div>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label" htmlFor="ln-room-type">Room type</label>
+          <select id="ln-room-type" className="form-input" value={form.roomType} onChange={set("roomType")}>
+            {ROOM_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
+          </select>
+        </div>
+
+        <div className="lform-section" style={{ marginTop: 28 }}>Amenities</div>
+        <div className="lform-amenities">
+          {AMENITIES.map((amenity) => (
+            <label key={amenity}>
+              <input
+                type="checkbox"
+                checked={form.amenities.includes(amenity)}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    amenities: event.target.checked
+                      ? [...current.amenities, amenity]
+                      : current.amenities.filter((item) => item !== amenity),
+                  }))
+                }
+              />
+              {amenity}
+            </label>
+          ))}
         </div>
 
         <div className="lform-section" style={{ marginTop: 28 }}>

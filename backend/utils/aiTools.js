@@ -11,6 +11,7 @@ const searchInput = z.object({
     maxPrice: z.number().optional().describe("Maximum price per night"),
     minPrice: z.number().optional().describe("Minimum price per night"),
     amenities: z.array(z.string()).optional().describe("Amenities the listing should have"),
+    roomType: z.string().optional().describe("Type of room or stay"),
 });
 
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -24,7 +25,7 @@ export const createListingSearchTool = (saveResults) =>
     tool({
         description: "Find real Nestly listings using location, country, keyword, and price filters.",
         inputSchema: searchInput,
-        execute: async ({ location, country, keyword, minPrice, maxPrice, amenities }) => {
+        execute: async ({ location, country, keyword, minPrice, maxPrice, amenities, roomType }) => {
             const query = {};
 
             if (location) {
@@ -47,9 +48,12 @@ export const createListingSearchTool = (saveResults) =>
             if (amenities?.length) {
                 query.amenities = { $all: amenities };
             }
+            if (roomType) {
+                query.roomType = textSearch(roomType);
+            }
 
             const listings = await Listing.find(query)
-                .select("_id title location country price image amenities")
+                .select("_id title location country price image amenities roomType")
                 .sort({ price: 1, _id: 1 })
                 .limit(12)
                 .lean();
@@ -57,13 +61,14 @@ export const createListingSearchTool = (saveResults) =>
             saveResults(listings);
             return {
                 count: listings.length,
-                listings: listings.map(({ _id, title, location, country, price, amenities }) => ({
+                listings: listings.map(({ _id, title, location, country, price, amenities, roomType }) => ({
                     id: _id.toString(),
                     title,
                     location,
                     country,
                     price,
                     amenities,
+                    roomType,
                 })),
             };
         },

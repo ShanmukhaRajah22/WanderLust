@@ -14,6 +14,7 @@ export const listingAmenities = [
     "Breakfast",
     "Washer",
 ];
+export const listingRoomTypes = ["Private room", "Entire home", "Suite", "Deluxe room", "Shared room"];
 
 // const defaultImage =
 //     "https://images.unsplash.com/photo-1502784444187-359ac186c5bb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHNreSUyMHZhY2F0aW9ufGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60";
@@ -30,6 +31,11 @@ const listingSchema = new Schema({
     price: Number,
     location: String,
     country: String,
+    roomType: {
+        type: String,
+        enum: listingRoomTypes,
+        default: "Private room",
+    },
     amenities: {
         type: [String],
         enum: listingAmenities,

@@ -67,6 +67,12 @@
   color: var(--ink-light);
   margin-bottom: 12px;
 }
+.lcard__room-type {
+  margin-bottom: 10px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+}
 .lcard__amenities {
   display: flex;
   flex-wrap: wrap;

@@ -17,6 +17,7 @@ const initDB = async () => {
     ];
     const listings = data.map((obj, index) => ({
         ...obj,
+        roomType: ["Private room", "Entire home", "Suite", "Deluxe room", "Shared room"][index % 5],
         amenities: amenitySets[index % amenitySets.length],
         owner: "6993006094eb8ec198c65fd7",
     }));

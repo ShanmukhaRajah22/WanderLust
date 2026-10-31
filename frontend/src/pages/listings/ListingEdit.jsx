@@ -5,6 +5,7 @@ import PageLoader from "../../components/ui/page-loader";
 import "./ListingForm.css";
 
 const AMENITIES = ["WiFi", "Pool", "Kitchen", "Air conditioning", "Free parking", "Pet friendly", "Workspace", "Hot tub", "Breakfast", "Washer"];
+const ROOM_TYPES = ["Private room", "Entire home", "Suite", "Deluxe room", "Shared room"];
 
 export default function ListingEdit({ listingId, onNavigate }) {
   const { showFlash } = useApp();
@@ -27,6 +28,7 @@ export default function ListingEdit({ listingId, onNavigate }) {
           country: l.country || "",
           imageUrl: l.image?.url || "",
           amenities: l.amenities || [],
+          roomType: l.roomType || "Private room",
         });
         setFetching(false);
       })
@@ -71,6 +73,7 @@ export default function ListingEdit({ listingId, onNavigate }) {
     fd.append("listing[location]", form.location);
     fd.append("listing[country]", form.country);
     fd.append("listing[amenities]", JSON.stringify(form.amenities));
+    fd.append("listing[roomType]", form.roomType);
     if (imgFile) fd.append("listing[image]", imgFile);
     try {
       await api.updateListing(listingId, fd);
@@ -131,6 +134,13 @@ export default function ListingEdit({ listingId, onNavigate }) {
               {amenity}
             </label>
           ))}
+        </div>
+
+        <div className="form-group">
+          <label className="form-label" htmlFor="le-room-type">Room type</label>
+          <select id="le-room-type" className="form-input" value={form.roomType} onChange={set("roomType")}>
+            {ROOM_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
+          </select>
         </div>
 
         <div className="form-group">

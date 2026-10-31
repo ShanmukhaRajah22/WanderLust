@@ -249,6 +249,10 @@ export default function ListingShow({ listingId, onNavigate }) {
           <div className="show-page__info-label">Country</div>
           <div className="show-page__info-val">🌐 {listing.country}</div>
         </div>
+        <div className="show-page__info-card">
+          <div className="show-page__info-label">Room type</div>
+          <div className="show-page__info-val">🛏️ {listing.roomType || "Private room"}</div>
+        </div>
       </div>
 
       {listing.geometry?.coordinates?.length === 2 && (

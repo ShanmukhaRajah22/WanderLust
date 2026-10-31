@@ -19,6 +19,7 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
     location: "",
     maxPrice: "",
     amenity: "",
+    roomType: "",
     mapOnly: false,
     checkIn: "",
     checkOut: "",
@@ -98,6 +99,7 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
     (!filters.location || l.location.toLowerCase().includes(filters.location.toLowerCase())) &&
     (!filters.maxPrice || Number(l.price) <= Number(filters.maxPrice)) &&
     (!filters.amenity || l.amenities?.includes(filters.amenity)) &&
+    (!filters.roomType || (l.roomType || "Private room") === filters.roomType) &&
     (!filters.mapOnly || l.geometry?.coordinates?.length === 2) &&
     (!datesAreValid || !availableIds || availableIds.has(l._id)),
   );
@@ -116,6 +118,7 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
       location: "",
       maxPrice: "",
       amenity: "",
+      roomType: "",
       mapOnly: false,
       checkIn: "",
       checkOut: "",
@@ -175,6 +178,18 @@ export default function ListingIndex({ onNavigate, onSelectListing }) {
               <option value="">Any amenity</option>
               {["WiFi", "Pool", "Kitchen", "Air conditioning", "Free parking", "Pet friendly", "Workspace", "Hot tub", "Breakfast", "Washer"].map((amenity) => (
                 <option key={amenity} value={amenity}>{amenity}</option>
+              ))}
+            </select>
+            <select
+              value={filters.roomType}
+              onChange={(event) => {
+                setFilter("roomType")(event);
+                scrollToListings();
+              }}
+            >
+              <option value="">Any room type</option>
+              {["Private room", "Entire home", "Suite", "Deluxe room", "Shared room"].map((type) => (
+                <option key={type} value={type}>{type}</option>
               ))}
             </select>
             <select
