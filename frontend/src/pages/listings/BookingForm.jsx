@@ -55,14 +55,45 @@ function BookingSuccess({ booking, listing, onClose }) {
   );
 }
 
+function BookingCancelled({ booking, listing, onClose }) {
+  return (
+    <div className="booking-success" role="dialog" aria-modal="true">
+      <div className="booking-success__card">
+        <div className="booking-success__icon">✓</div>
+        <p className="booking-success__eyebrow">Reservation cancelled</p>
+        <h2>Booking removed</h2>
+        <p className="booking-success__text">
+          Your reservation at <strong>{listing.title}</strong> was cancelled
+          successfully.
+        </p>
+        <div className="booking-success__dates">
+          <div>
+            <span>Check-in</span>
+            <strong>{new Date(`${booking.checkIn}T00:00:00`).toLocaleDateString()}</strong>
+          </div>
+          <div>
+            <span>Check-out</span>
+            <strong>{new Date(`${booking.checkOut}T00:00:00`).toLocaleDateString()}</strong>
+          </div>
+        </div>
+        <p className="booking-success__note">
+          Those dates are available to book again.
+        </p>
+        <button className="btn btn-dark" onClick={onClose}>
+          Continue exploring
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function BookingForm({ listing, onNavigate }) {
   const { currentUser, showFlash } = useApp();
   const [dates, setDates] = useState({ checkIn: "", checkOut: "" });
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [cancellationMessage, setCancellationMessage] = useState("");
   const [confirmedBooking, setConfirmedBooking] = useState(null);
+  const [cancelledBooking, setCancelledBooking] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const roomOptions = listing.roomInventory?.length
     ? listing.roomInventory
@@ -103,7 +134,6 @@ export default function BookingForm({ listing, onNavigate }) {
     try {
       await api.createBooking(listing._id, { booking: { ...dates, roomType } });
       showFlash("Booking confirmed!");
-      setSuccessMessage("Your stay is booked successfully.");
       setConfirmedBooking(dates);
       setDates({ checkIn: "", checkOut: "" });
       await loadBookings();
@@ -120,7 +150,9 @@ export default function BookingForm({ listing, onNavigate }) {
       await api.deleteBooking(listing._id, bookingId);
       const message = "Your booking was cancelled and removed.";
       showFlash(message);
-      setCancellationMessage(message);
+      setCancelledBooking(
+        bookings.find((booking) => booking._id === bookingId),
+      );
       await loadBookings();
     } catch (error) {
       showFlash(error.message || "Could not cancel booking.", "error");
@@ -173,15 +205,6 @@ export default function BookingForm({ listing, onNavigate }) {
         </button>
       </form>
 
-      {successMessage && (
-        <p className="booking-card__success">{successMessage}</p>
-      )}
-      {cancellationMessage && (
-        <p className="booking-card__success" role="status">
-          {cancellationMessage}
-        </p>
-      )}
-
       {bookings.length > 0 && (
         <div className="booking-card__booked">
           <strong>Booked dates</strong>
@@ -214,6 +237,15 @@ export default function BookingForm({ listing, onNavigate }) {
             booking={confirmedBooking}
             listing={listing}
             onClose={() => setConfirmedBooking(null)}
+          />,
+          document.body,
+        )}
+      {cancelledBooking &&
+        createPortal(
+          <BookingCancelled
+            booking={cancelledBooking}
+            listing={listing}
+            onClose={() => setCancelledBooking(null)}
           />,
           document.body,
         )}
