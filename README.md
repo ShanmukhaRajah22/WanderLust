@@ -1,75 +1,94 @@
 # Nestly
 
-Nestly is a full-stack travel accommodation platform where users can discover
-stays, publish listings, view locations on a map, make reservations, and leave
-reviews.
+Nestly is a full-stack accommodation marketplace for discovering stays,
+publishing properties, checking availability, and making room-based
+reservations.
 
-The project uses a React and Vite frontend with an Express and MongoDB backend.
-It also includes natural-language listing search through OpenRouter's free
-router and free OpenStreetMap geocoding.
+The application combines a React/Vite client with an Express/MongoDB API. It
+includes free OpenStreetMap mapping and geocoding, Cloudinary image uploads,
+session authentication, server-side booking validation, and natural-language
+search powered by OpenRouter's `openrouter/free` model.
 
-## Features
+## Product capabilities
 
-### Listings
+### Discovery
 
-- Browse all available stays
-- Search by title, location, country, or keyword
-- Filter by country, maximum price, map availability, and dates
-- Filter by amenities and room type
-- Paginate results with 12 listings per page
+- Search by listing title, description, city, or country
+- Filter by country, maximum nightly price, amenities, room type, map location,
+  and booking dates
 - Sort by price, title, or newest listing
+- Browse paginated results with 12 listings per page
+- View listings on an interactive Leaflet/OpenStreetMap map
+- Open an individual listing with its location, room details, amenities,
+  reviews, and booking form
+
+### Listing management
+
 - Create, edit, and delete listings
-- Upload listing images through Cloudinary
-- View each listing's location on an OpenStreetMap map
-- Store listing coordinates as GeoJSON
-- Add multiple room types and room counts to one listing
+- Upload images with Cloudinary and Multer
+- Geocode a listing's city and country through the OpenStreetMap provider
+- Store coordinates as GeoJSON
+- Define amenities such as WiFi, pool, kitchen, workspace, and pet-friendly
+  access
+- Define room types such as private room, entire home, suite, deluxe room, and
+  shared room
+- Configure inventory for multiple room types, for example five suites and
+  ten deluxe rooms
 
-### Accounts and permissions
+### Accounts and authorization
 
-- Sign up, log in, and log out
-- Passport local authentication with MongoDB-backed sessions
-- View a personal profile and listing activity
-- Only listing owners can edit or delete their listings
-- Only review authors can delete their reviews
+- Sign up, log in, and log out with Passport local authentication
+- Persist sessions in MongoDB
+- View a personal profile with listings, reviews, and activity statistics
+- Restrict listing updates and deletion to listing owners
+- Restrict review deletion to review authors
+- Restrict booking cancellation to the guest who created the booking
 
-### Reviews
-
-- Add a 1-to-5 star review
-- Add comments to listings
-- Delete your own reviews
-- View review author avatars and dates
-
-### Bookings
+### Reservations
 
 - Select check-in and check-out dates with a calendar range picker
-- Choose a room type when a listing has multiple room types
-- Calculate nights and total price before booking
-- Allow overlapping reservations while rooms remain available
+- Select a room type when a listing has multiple room types
+- Calculate the number of nights and estimated total before submitting
+- Reject invalid, past, or overlapping dates
+- Allow multiple guests to book the same dates while room capacity remains
 - Reject a booking when all rooms of the selected type are occupied
-- Store confirmed booking dates in MongoDB
+- Store booking dates, room type, guest, listing, and status in MongoDB
 - View booked date ranges on listing pages
-- View all personal reservations on My Bookings
-- Cancel your own confirmed reservations
-- Show a centered booking confirmation dialog with confetti
+- View and cancel reservations from My Bookings
+- Show confirmation feedback and confetti after a successful booking
 
 ### AI assistant
 
-- Ask for listings using natural language, such as:
-  `Show places under 2000 in Goa`
-- Search listings using controlled, validated MongoDB filters
-- Check whether a listing is available for specific dates
-- Use the OpenRouter `openrouter/free` model
-- Keep the API key on the backend
-- Limit request size and apply a small per-IP rate limit
+- Search for stays using natural language
+- Filter AI results by location, country, keyword, price, amenities, and room
+  type
+- Check availability for a listing and date range
+- Use controlled server-side tools instead of exposing arbitrary MongoDB queries
+- Keep the OpenRouter API key on the backend
+- Validate message size and conversation length
+- Apply per-IP rate limiting
 
-### UI and experience
+## Architecture
 
-- Responsive React interface
-- Landing hero with search and filter controls
-- Full-screen loading states for major page loads
-- Flash notifications for successful and failed actions
-- Reusable calendar, avatar, icon button, and loader components
-- Leaflet markers for multiple listings and individual listing locations
+```text
+React + Vite frontend
+        |
+        | JSON, multipart forms, HTTP-only session cookie
+        v
+Express API
+  |-- Passport + MongoDB sessions
+  |-- Zod request validation
+  |-- Listing, review, user, booking, and AI controllers
+  |-- OpenStreetMap geocoding
+  |-- Cloudinary image storage
+        |
+        v
+MongoDB
+```
+
+In development, Vite proxies API requests to Express. In production, the
+Express server can serve the generated `frontend/dist` directory, or the
+frontend and backend can be deployed separately.
 
 ## Technology stack
 
@@ -77,106 +96,94 @@ router and free OpenStreetMap geocoding.
 
 | Technology | Purpose |
 | --- | --- |
-| React 19 | User interface |
-| Vite 7 | Development server and production build |
-| React Leaflet and Leaflet | Interactive maps |
+| React 19 | Component-based user interface |
+| Vite 7 | Development server and production bundling |
+| React Leaflet and Leaflet | Interactive maps and markers |
 | OpenStreetMap | Free map tiles |
-| React Day Picker | Booking date range selection |
+| React Day Picker | Booking date-range selection |
 | date-fns | Date calculations |
-| Lucide React | UI icons |
-| canvas-confetti | Booking success celebration |
-| CSS and JSX components | Styling and reusable UI |
+| Lucide React | Interface icons |
+| canvas-confetti | Booking confirmation effect |
+| JSX and CSS | Reusable components and styling |
 
 ### Backend
 
 | Technology | Purpose |
 | --- | --- |
 | Node.js 22 | JavaScript runtime |
-| Express 5 | REST API |
-| MongoDB and Mongoose 8 | Database and data models |
-| Passport and passport-local | Authentication |
-| express-session and connect-mongo | Persistent sessions |
+| Express 5 | HTTP API and middleware |
+| MongoDB and Mongoose 8 | Persistence and data models |
+| Passport and passport-local | Local authentication |
+| express-session and connect-mongo | Persistent HTTP sessions |
 | Cloudinary and Multer | Image upload and storage |
 | Zod | Request validation |
-| node-geocoder | Address geocoding |
+| node-geocoder | Address-to-coordinate conversion |
 | OpenStreetMap | Free geocoding provider |
-| Vercel AI SDK and OpenRouter | AI listing search |
+| Vercel AI SDK and OpenRouter | AI search and availability tools |
 
 ## Project structure
 
 ```text
 Nestly/
 ├── backend/
-│   ├── app.js                    # Express application and middleware
-│   ├── cloudConfig.js            # Cloudinary upload configuration
-│   ├── middleware.js             # Authentication and authorization helpers
-│   ├── schema.js                 # Zod validation schemas
+│   ├── app.js                    # Express app, sessions, CORS, routes
+│   ├── cloudConfig.js            # Cloudinary/Multer configuration
+│   ├── middleware.js             # Auth, ownership, parsing, validation
+│   ├── schema.js                 # Zod schemas
 │   ├── controllers/
 │   │   ├── ai.js                 # OpenRouter chat endpoint
-│   │   ├── bookings.js           # Booking creation and cancellation
-│   │   ├── listings.js           # Listing CRUD and geocoding
+│   │   ├── bookings.js           # Availability and booking operations
+│   │   ├── listings.js           # CRUD, filters, pagination, geocoding
 │   │   ├── reviews.js            # Review operations
-│   │   └── users.js              # Authentication and profile operations
+│   │   └── users.js              # Account and profile operations
+│   ├── middleware/
+│   │   ├── rateLimit.js          # Auth and booking request limits
+│   │   └── rateLimitAi.js        # AI request limit
 │   ├── models/
-│   │   ├── booking.js            # Reservation dates and room type
-│   │   ├── listing.js            # Listing, amenities, rooms, and coordinates
-│   │   ├── review.js             # Listing reviews
-│   │   └── user.js               # User accounts
-│   ├── routes/
-│   │   ├── ai.js                 # /ai routes
-│   │   ├── booking.js            # Listing booking routes
-│   │   ├── bookings.js           # Current-user booking routes
-│   │   ├── listing.js            # Listing routes
-│   │   ├── review.js             # Review routes
-│   │   └── user.js               # Authentication routes
+│   │   ├── booking.js            # Dates, room type, guest, status
+│   │   ├── listing.js            # Amenities, room inventory, GeoJSON
+│   │   ├── review.js             # Ratings and comments
+│   │   └── user.js               # Passport user model
+│   ├── routes/                   # Express route definitions
 │   ├── utils/
-│   │   ├── aiTools.js            # Safe AI listing and availability tools
-│   │   ├── ExpressError.js       # Custom API errors
-│   │   └── wrapAsync.js           # Async route wrapper
+│   │   ├── aiTools.js            # Safe listing and availability tools
+│   │   ├── ExpressError.js       # API error type
+│   │   └── wrapAsync.js           # Async controller wrapper
 │   └── init/
-│       ├── data.js               # Seed data for 25 listings
-│       └── index.js              # Database seed script
+│       ├── data.js               # Sample listing source data
+│       └── index.js              # Seed script
 ├── frontend/
-│   ├── index.html
-│   ├── vite.config.js             # Development API proxy
+│   ├── index.html                # Browser entry document
+│   ├── vite.config.js            # API proxy configuration
 │   └── src/
-│       ├── App.jsx                # Application router and page switching
-│       ├── context/
-│       │   └── AppContext.jsx     # Session, auth, and flash state
-│       ├── components/
-│       │   ├── includes/          # Navbar, footer, cards, map, AI assistant
-│       │   └── ui/                # Calendar, loaders, icons, and avatars
-│       ├── pages/
-│       │   ├── listings/          # Listing, booking, and map pages
-│       │   ├── users/             # Login, signup, profile, and bookings
-│       │   └── StaticPages.jsx    # Privacy, terms, and error pages
-│       └── utils/
-│           └── api.js             # Frontend API client
-├── package.json                   # Root scripts
+│       ├── App.jsx               # Client-side page switching
+│       ├── context/              # Session and flash state
+│       ├── components/           # Shared layout, map, cards, and UI
+│       ├── pages/                # Listing, user, booking, and static pages
+│       └── utils/api.js          # Frontend API client
+├── package.json                  # Root development scripts
 └── README.md
 ```
 
 ## Requirements
 
 - Node.js 22.17.0 recommended
-- MongoDB local instance or MongoDB Atlas
-- Cloudinary account for listing images
-- OpenRouter API key for AI search
+- MongoDB local server or MongoDB Atlas
+- Cloudinary account for image uploads
+- OpenRouter API key for the AI assistant
 
-Node.js 24 may work, but the backend currently declares Node.js 22.17.0 as
-its supported engine.
+The backend declares Node.js 22.17.0 as its supported engine. Other recent
+Node.js versions may work but are not the tested target.
 
 ## Installation
 
-Clone the existing repository and install both applications:
-
 ```bash
-git clone https://github.com/ShanmukhaRajah22/WanderLust.git
-cd Wanderlust-using-React
+git clone https://github.com/ShanmukhaRajah22/Nestly.git
+cd Nestly
 npm run install:all
 ```
 
-You can also install each application independently:
+To install applications separately:
 
 ```bash
 cd backend
@@ -186,7 +193,7 @@ cd ../frontend
 npm install
 ```
 
-## Environment variables
+## Environment configuration
 
 Create `backend/.env`:
 
@@ -201,47 +208,47 @@ FRONTEND_URL=http://localhost:5173
 NODE_ENV=development
 ```
 
-For a local MongoDB instance, use:
+For local MongoDB:
 
 ```env
 ATLASDB_URL=mongodb://127.0.0.1:27017/wanderlust
 ```
 
-For a deployed frontend, set `FRONTEND_URL` to the frontend's full HTTPS
-origin. Multiple allowed frontend origins can be supplied through
-`FRONTEND_URLS`, separated by commas.
+For more than one allowed frontend origin, use a comma-separated
+`FRONTEND_URLS` value. In production, use the deployed frontend's HTTPS
+origin.
 
-The frontend reads its backend base URL from `VITE_API_URL`. For local
-development it can remain empty because Vite proxies API requests:
+The frontend reads the backend URL from `VITE_API_URL`. It can remain empty
+locally because Vite uses the configured development proxy:
 
 ```env
 VITE_API_URL=
 ```
 
-Never expose `OPENROUTER_API_KEY`, Cloudinary secrets, or `SECRET` in frontend
-code or frontend environment variables.
+Never put `OPENROUTER_API_KEY`, Cloudinary secrets, or `SECRET` in frontend
+files or frontend environment variables.
 
-## Seed the database
+## Seed data
 
-The seed script clears and inserts the sample data from
-`backend/init/data.js`, which currently contains 25 listings:
+The seed script recreates 25 sample listings and assigns starter amenities,
+room types, and room inventory:
 
 ```bash
 npm run seed
 ```
 
-Run this only against a database where replacing the listing seed data is
-acceptable.
+The script clears the existing seeded listings before inserting new ones. Run
+it only when replacing the listing data in the target database is acceptable.
 
-## Run locally
+## Local development
 
-Start the backend in one terminal:
+Start the backend:
 
 ```bash
 npm run dev:backend
 ```
 
-Start the frontend in another terminal:
+Start the frontend in a second terminal:
 
 ```bash
 npm run dev:frontend
@@ -249,105 +256,133 @@ npm run dev:frontend
 
 Open [http://localhost:5173](http://localhost:5173).
 
-The frontend development server proxies `/listings`, `/bookings`, `/ai`,
-authentication requests, and other API calls to the Express server.
-
 ## Production build
 
-Build the React frontend:
+Build the frontend:
 
 ```bash
 npm run build:frontend
 ```
 
-The complete root build also installs dependencies before building:
+The root build installs both applications and then builds the frontend:
 
 ```bash
 npm run build
 ```
 
-When `NODE_ENV=production`, the Express server serves the generated
-`frontend/dist` files as a single full-stack deployment.
-
-Start the backend:
+For a single-service deployment, set `NODE_ENV=production` and start Express:
 
 ```bash
 npm start
 ```
 
+Express will serve `frontend/dist` when it is present. The frontend and
+backend may also be deployed as separate services.
+
 ## API reference
 
-All JSON requests require `Content-Type: application/json` unless the endpoint
-uses multipart form data for an image upload. Authentication uses an HTTP-only
-session cookie.
+Requests use JSON unless an endpoint accepts a multipart listing form.
+Authenticated requests use the HTTP-only session cookie.
 
 ### Authentication and profile
 
 | Method | Endpoint | Description | Auth |
 | --- | --- | --- | --- |
-| POST | `/signup` | Create a user account | No |
-| POST | `/login` | Start a user session | No |
+| POST | `/signup` | Create an account | No |
+| POST | `/login` | Start a session | No |
 | GET | `/logout` | End the current session | No |
 | GET | `/me` | Return the current session user | No |
-| GET | `/users/me` | Return the authenticated user's profile and stats | Yes |
+| GET | `/users/me` | Return profile, listings, reviews, and stats | Yes |
 
 ### Listings
 
 | Method | Endpoint | Description | Auth |
 | --- | --- | --- | --- |
-| GET | `/listings` | Return all listings | No |
-| GET | `/listings/:id` | Return one listing and its reviews | No |
-| POST | `/listings` | Create a listing, optionally with an image | Yes |
-| PUT | `/listings/:id` | Update a listing, optionally with an image | Owner |
+| GET | `/listings` | Return a filtered, sorted page of listings | No |
+| GET | `/listings/:id` | Return one listing with reviews | No |
+| POST | `/listings` | Create a listing and geocode its address | Yes |
+| PUT | `/listings/:id` | Update a listing | Owner |
 | DELETE | `/listings/:id` | Delete a listing | Owner |
 
-Listing create and update operations geocode the submitted address through
-the OpenStreetMap provider before saving GeoJSON coordinates.
+`GET /listings` supports these query parameters:
+
+| Parameter | Example | Description |
+| --- | --- | --- |
+| `page` | `2` | Page number, starting at 1 |
+| `limit` | `12` | Results per page, capped by the server |
+| `search` | `beach` | Searches title, description, location, and country |
+| `location` | `Goa` | Location filter |
+| `country` | `India` | Exact country filter |
+| `maxPrice` | `3000` | Maximum nightly price |
+| `amenity` | `WiFi` | Required amenity |
+| `roomType` | `Suite` | Room type filter |
+| `mapOnly` | `true` | Return listings with coordinates |
+| `sort` | `priceAsc` | `priceAsc`, `priceDesc`, `title`, or `newest` |
+
+The response contains `listings` and a `pagination` object with `page`, `limit`,
+`total`, and `pages`.
 
 ### Reviews
 
 | Method | Endpoint | Description | Auth |
 | --- | --- | --- | --- |
-| POST | `/listings/:id/reviews` | Add a review | Yes |
+| POST | `/listings/:id/reviews` | Add a rating and comment | Yes |
 | DELETE | `/listings/:id/reviews/:reviewId` | Delete a review | Author |
 
 ### Bookings
 
 | Method | Endpoint | Description | Auth |
 | --- | --- | --- | --- |
-| GET | `/listings/:id/bookings` | Return booked date ranges for a listing | No |
-| POST | `/listings/:id/bookings` | Create a reservation | Yes |
+| GET | `/listings/:id/bookings` | Return confirmed date ranges and room types | No |
+| POST | `/listings/:id/bookings` | Create a room reservation | Yes |
 | DELETE | `/listings/:id/bookings/:bookingId` | Cancel your reservation | Yes |
 | GET | `/bookings/me` | Return the current user's reservations | Yes |
 
-The server rejects overlapping reservations using:
+## Booking availability and concurrency
+
+A booking stores:
+
+```js
+{
+  listing,
+  guest,
+  checkIn,
+  checkOut,
+  roomType,
+  status
+}
+```
+
+For a requested date range, the server considers a booking overlapping when:
 
 ```text
 existing.checkIn < requested.checkOut
 AND existing.checkOut > requested.checkIn
 ```
 
-Back-to-back reservations are allowed. Booking dates and the selected room type are stored persistently in MongoDB and
-are not kept only in frontend state. A listing can define inventory such as:
+Back-to-back stays are therefore allowed. The server counts overlapping
+confirmed bookings for the selected room type and compares that count with
+the room type's `totalRooms` capacity.
 
-```js
-roomInventory: [
-  { roomType: "Suite", totalRooms: 5 },
-  { roomType: "Deluxe room", totalRooms: 10 }
-]
-```
+For example, if a listing has five suites, four overlapping suite bookings
+still allow another suite booking. A sixth overlapping suite booking is
+rejected with HTTP `409`. Bookings for a different room type use separate
+capacity.
 
-Two guests can reserve the same dates when different rooms of the selected
-type are still available. The server counts overlapping confirmed bookings for
-that room type before saving a new booking. A small in-process booking lock
-serializes simultaneous requests for the same listing and room type, so two
-requests handled by the same server cannot both consume the final room.
+The application also serializes booking checks for the same listing and room
+type within one running Node.js process. This prevents two simultaneous
+requests from both consuming the final room on that server instance.
 
-### AI assistant
+For a horizontally scaled deployment with multiple backend instances, a
+database-level transaction or atomic inventory reservation would be required
+for strict cross-instance locking. The current implementation is intentionally
+simple and suitable for the application's single-process deployment model.
+
+## AI assistant
 
 | Method | Endpoint | Description | Auth |
 | --- | --- | --- | --- |
-| POST | `/ai/chat` | Search listings or check availability with natural language | No |
+| POST | `/ai/chat` | Search listings or check availability | No |
 
 Example request:
 
@@ -356,23 +391,25 @@ Example request:
   "messages": [
     {
       "role": "user",
-      "content": "Show places under 2000 in Goa"
+      "content": "Show suite stays in Goa with WiFi under 3000"
     }
   ]
 }
 ```
 
-The backend always uses the OpenRouter-compatible `openrouter/free` model.
-Requests are validated, limited to 12 messages, limited to 1,000 characters per
-message, and restricted to the application's listing and availability tools.
+The backend always uses OpenRouter's `openrouter/free` model. Messages are
+validated to a maximum of 12 messages and 1,000 characters per message. The
+assistant can call only the application's listing search and availability
+tools.
 
 ## Maps and geocoding
 
-- Map tiles come from OpenStreetMap.
-- Leaflet renders the map in the React frontend.
+- Leaflet renders maps in React.
+- OpenStreetMap supplies free map tiles.
 - No frontend map API key is required.
 - `node-geocoder` uses the free `openstreetmap` provider.
-- Listing coordinates are saved as GeoJSON:
+- Listing create/update operations geocode the submitted location.
+- Coordinates are stored as:
 
 ```js
 {
@@ -383,31 +420,36 @@ message, and restricted to the application's listing and availability tools.
 
 ## Validation and security
 
-- Request bodies are validated with Zod.
-- Authentication and ownership middleware protect private operations.
-- Sessions are stored in MongoDB through `connect-mongo`.
-- AI requests are rate-limited per IP in memory.
+- Listing, review, and booking payloads are validated with Zod.
+- Private operations require an authenticated session.
+- Listing and review authorization is checked on the server.
+- Sessions are persisted through `connect-mongo`.
+- AI requests are rate-limited to 10 requests per 15 minutes per IP.
 - Login and signup requests are limited to 10 requests per 15 minutes per IP.
 - Booking creation is limited to 30 requests per 15 minutes per IP.
-- Secrets remain backend-only.
-- User-provided listing data is not converted into arbitrary MongoDB queries.
-- Booking overlap checks run on the server before a reservation is saved.
+- User input is converted into controlled filters rather than arbitrary
+  MongoDB queries.
+- Secrets are read only by the backend.
+- Booking overlap and capacity checks run on the server.
+
+The rate limiters use in-memory state. For multiple backend instances, use a
+shared rate-limit store such as Redis.
 
 ## Available scripts
 
-Run these commands from the repository root:
+Run from the repository root:
 
 | Command | Description |
 | --- | --- |
 | `npm run install:all` | Install backend and frontend dependencies |
-| `npm run dev:backend` | Start the backend with Nodemon |
+| `npm run dev:backend` | Start Express with Nodemon |
 | `npm run dev:frontend` | Start the Vite development server |
 | `npm run build:frontend` | Build the frontend |
 | `npm run build` | Install dependencies and build the frontend |
-| `npm run seed` | Replace database listings with the 25 seed entries |
+| `npm run seed` | Recreate the 25 sample listings |
 | `npm start` | Start the backend |
 
-Frontend-only commands:
+Frontend checks:
 
 ```bash
 cd frontend
@@ -415,45 +457,26 @@ npm run lint
 npm run build
 ```
 
-The seed command assigns amenities, room types, and starter room inventory to
-all 25 sample listings. Run it again if an existing database was seeded before
-these fields were added. It clears and recreates the sample listings.
+## Deployment checklist
 
-## Deployment notes
-
-Nestly can be deployed as separate frontend and backend services or as one
-production Express service serving the React build.
-
-For separate deployment:
-
-1. Deploy the backend with its MongoDB, Cloudinary, session, and OpenRouter
-   environment variables.
-2. Set the backend `FRONTEND_URL` or `FRONTEND_URLS` to the deployed frontend
-   origin.
-3. Set the frontend `VITE_API_URL` to the deployed backend URL.
-4. Build and deploy the frontend with `npm run build`.
-5. Confirm cookies are enabled and HTTPS is used in production.
-
-For a single service:
-
-1. Build the frontend.
-2. Set `NODE_ENV=production`.
-3. Start the backend with `npm start`.
-4. Ensure the backend can access the generated `frontend/dist` directory.
+1. Provision MongoDB and Cloudinary.
+2. Configure all backend environment variables.
+3. Configure `FRONTEND_URL` or `FRONTEND_URLS` for the deployed frontend.
+4. Configure `VITE_API_URL` if frontend and backend are separate services.
+5. Use HTTPS in production so secure session cookies work correctly.
+6. Build the frontend with `npm run build:frontend`.
+7. Confirm the deployed frontend can create a session and call protected
+   endpoints.
+8. Run the seed command only if the target database should be replaced with
+   the sample listings.
 
 ## Contributing
 
-1. Fork the repository.
-2. Create a feature branch:
-
-   ```bash
-   git checkout -b feature/your-change
-   ```
-
-3. Make a focused change.
-4. Run the relevant build and lint commands.
-5. Commit and push your branch.
-6. Open a pull request with a clear description.
+1. Create a focused feature branch.
+2. Keep changes small and consistent with the existing React/Express patterns.
+3. Run the relevant lint and build commands.
+4. Document behavior changes in the README when appropriate.
+5. Open a pull request with a clear summary and validation details.
 
 ## License
 
@@ -461,5 +484,5 @@ This project is licensed under the ISC license.
 
 ---
 
-Built with React, Express, MongoDB, OpenStreetMap, and a lot of coffee by
+Built with React, Express, MongoDB, OpenStreetMap, and OpenRouter by
 **Shanmukha Rajah**.
