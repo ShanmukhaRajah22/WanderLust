@@ -28,7 +28,6 @@ export default function ListingEdit({ listingId, onNavigate }) {
           country: l.country || "",
           imageUrl: l.image?.url || "",
           amenities: l.amenities || [],
-          roomType: l.roomType || "Private room",
           roomInventory: l.roomInventory || [{ roomType: l.roomType || "Private room", totalRooms: 1 }],
         });
         setFetching(false);
@@ -74,7 +73,6 @@ export default function ListingEdit({ listingId, onNavigate }) {
     fd.append("listing[location]", form.location);
     fd.append("listing[country]", form.country);
     fd.append("listing[amenities]", JSON.stringify(form.amenities));
-    fd.append("listing[roomType]", form.roomType);
     fd.append("listing[roomInventory]", JSON.stringify(form.roomInventory));
     if (imgFile) fd.append("listing[image]", imgFile);
     try {
@@ -136,13 +134,6 @@ export default function ListingEdit({ listingId, onNavigate }) {
               {amenity}
             </label>
           ))}
-        </div>
-
-        <div className="form-group">
-          <label className="form-label" htmlFor="le-room-type">Room type</label>
-          <select id="le-room-type" className="form-input" value={form.roomType} onChange={set("roomType")}>
-            {ROOM_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
-          </select>
         </div>
 
         <div className="lform-section" style={{ marginTop: 28 }}>Room inventory</div>

@@ -16,7 +16,6 @@ export default function ListingNew({ onNavigate, onCreated }) {
     country: "",
     imageUrl: "",
     amenities: [],
-    roomType: "Private room",
     roomInventory: [{ roomType: "Private room", totalRooms: 1 }],
   });
   const [imgFile, setImgFile] = useState(null);
@@ -57,7 +56,6 @@ export default function ListingNew({ onNavigate, onCreated }) {
     fd.append("listing[location]", form.location);
     fd.append("listing[country]", form.country);
     fd.append("listing[amenities]", JSON.stringify(form.amenities));
-    fd.append("listing[roomType]", form.roomType);
     fd.append("listing[roomInventory]", JSON.stringify(form.roomInventory));
     if (imgFile) fd.append("listing[image]", imgFile);
     try {
@@ -163,13 +161,6 @@ export default function ListingNew({ onNavigate, onCreated }) {
             />
             {errors.country && <p className="form-error">{errors.country}</p>}
           </div>
-        </div>
-
-        <div className="form-group">
-          <label className="form-label" htmlFor="ln-room-type">Room type</label>
-          <select id="ln-room-type" className="form-input" value={form.roomType} onChange={set("roomType")}>
-            {ROOM_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
-          </select>
         </div>
 
         <div className="lform-section" style={{ marginTop: 28 }}>Amenities</div>

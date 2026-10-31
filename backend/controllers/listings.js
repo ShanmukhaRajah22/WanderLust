@@ -17,6 +17,12 @@ const geocodeListing = async (listing) => {
         type: "Point",
         coordinates: [result.longitude, result.latitude],
     };
+
+    const syncPrimaryRoomType = (listing) => {
+        if (listing.roomInventory?.length) {
+            listing.roomType = listing.roomInventory[0].roomType;
+        }
+    };
 };
 
 // GET /listings
@@ -105,6 +111,7 @@ export const showListing = async (req, res) => {
 // POST /listings
 export const createListing = async (req, res) => {
     const newListing = new Listing(req.body.listing);
+    syncPrimaryRoomType(newListing);
     newListing.owner = req.user._id;
     await geocodeListing(newListing);
 
@@ -156,6 +163,7 @@ export const updateListing = async (req, res) => {
         listing.location !== req.body.listing.location ||
         listing.country !== req.body.listing.country;
     Object.assign(listing, req.body.listing);
+    syncPrimaryRoomType(listing);
     if (locationChanged) {
         await geocodeListing(listing);
     }
