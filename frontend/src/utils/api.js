@@ -1,10 +1,15 @@
 const BASE = import.meta.env.VITE_API_URL || "";
 
 async function req(path, opts = {}) {
+  const headers = { ...opts.headers };
+  if (opts.body && !headers["Content-Type"]) {
+    headers["Content-Type"] = "application/json";
+  }
+
   const res = await fetch(`${BASE}${path}`, {
     credentials: "include",
-    headers: { "Content-Type": "application/json", ...opts.headers },
     ...opts,
+    headers,
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));

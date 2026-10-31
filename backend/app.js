@@ -60,6 +60,7 @@ const corsOptions = {
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     optionsSuccessStatus: 204,
+    maxAge: 600,
 };
 
 app.use(cors(corsOptions));
