@@ -4,18 +4,19 @@ import wrapAsync from "../utils/wrapAsync.js";
 import passport from "passport";
 import { isLoggedIn } from "../middleware.js";
 import * as userController from "../controllers/users.js";
+import { limitAuthRequests } from "../middleware/rateLimit.js";
 
 // signup form render route
 router.get("/signup", userController.renderSignupForm);
 
 // signup form submit route
-router.post("/signup", wrapAsync(userController.signup));
+router.post("/signup", limitAuthRequests, wrapAsync(userController.signup));
 
 // login form render route
 router.get("/login", userController.renderLoginForm);
 
 // login form submit route
-router.post("/login", (req, res, next) => {
+router.post("/login", limitAuthRequests, (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) return next(err);
     if (!user) return res.status(401).json({ message: info?.message || "Invalid username or password" });
