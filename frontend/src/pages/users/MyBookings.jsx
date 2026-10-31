@@ -11,6 +11,7 @@ export default function MyBookings({ onNavigate }) {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(null);
+  const [cancellationMessage, setCancellationMessage] = useState("");
 
   const loadBookings = () => {
     api
@@ -31,7 +32,9 @@ export default function MyBookings({ onNavigate }) {
       setBookings((current) =>
         current.filter((item) => item._id !== booking._id),
       );
-      showFlash("Booking cancelled.");
+      const message = "Your booking was cancelled and removed.";
+      showFlash(message);
+      setCancellationMessage(message);
     } catch (error) {
       showFlash(error.message || "Could not cancel booking.", "error");
     } finally {
@@ -56,6 +59,11 @@ export default function MyBookings({ onNavigate }) {
       <p className="my-bookings__intro">
         Keep track of your confirmed stays in one place.
       </p>
+      {cancellationMessage && (
+        <p className="my-bookings__success" role="status">
+          {cancellationMessage}
+        </p>
+      )}
 
       {bookings.length === 0 ? (
         <div className="empty-state">

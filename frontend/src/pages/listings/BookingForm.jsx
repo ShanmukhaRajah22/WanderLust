@@ -61,6 +61,7 @@ export default function BookingForm({ listing, onNavigate }) {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [cancellationMessage, setCancellationMessage] = useState("");
   const [confirmedBooking, setConfirmedBooking] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
 
@@ -113,7 +114,9 @@ export default function BookingForm({ listing, onNavigate }) {
     setDeletingId(bookingId);
     try {
       await api.deleteBooking(listing._id, bookingId);
-      showFlash("Booking cancelled.");
+      const message = "Your booking was cancelled and removed.";
+      showFlash(message);
+      setCancellationMessage(message);
       await loadBookings();
     } catch (error) {
       showFlash(error.message || "Could not cancel booking.", "error");
@@ -152,6 +155,11 @@ export default function BookingForm({ listing, onNavigate }) {
 
       {successMessage && (
         <p className="booking-card__success">{successMessage}</p>
+      )}
+      {cancellationMessage && (
+        <p className="booking-card__success" role="status">
+          {cancellationMessage}
+        </p>
       )}
 
       {bookings.length > 0 && (

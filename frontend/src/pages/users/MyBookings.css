@@ -27,6 +27,12 @@
   font-size: 15px;
 }
 
+.my-bookings__success {
+  margin: -14px 0 24px;
+  color: var(--success);
+  font-weight: 600;
+}
+
 .my-bookings__list {
   display: grid;
   gap: 16px;
